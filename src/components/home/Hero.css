@@ -1,0 +1,96 @@
+.hero {
+    position: relative;
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    margin-top: -80px;
+    /* Offset for fixed navbar */
+    padding-top: 120px;
+    overflow: hidden;
+}
+
+.hero__background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.hero__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 30%;
+}
+
+.hero__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            rgba(255, 255, 255, 0.95) 0%,
+            rgba(255, 255, 255, 0.7) 50%,
+            rgba(255, 255, 255, 0) 100%);
+}
+
+.hero__content {
+    position: relative;
+    z-index: 10;
+}
+
+.hero__text {
+    max-width: 600px;
+}
+
+.hero__title {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    color: var(--color-primary-dark);
+    margin-bottom: var(--spacing-md);
+    line-height: 1.1;
+    letter-spacing: -1px;
+}
+
+.hero__description {
+    font-size: 1.25rem;
+    color: var(--color-text-main);
+    margin-bottom: var(--spacing-xl);
+    font-weight: 500;
+}
+
+.hero__actions {
+    display: flex;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+.bg-white {
+    background-color: rgba(255, 255, 255, 0.8) !important;
+}
+
+@media (max-width: 768px) {
+    .hero__overlay {
+        background: linear-gradient(0deg,
+                rgba(255, 255, 255, 0.95) 0%,
+                rgba(255, 255, 255, 0.8) 50%,
+                rgba(255, 255, 255, 0.4) 100%);
+    }
+
+    .hero__text {
+        margin-top: 20vh;
+        text-align: center;
+    }
+
+    .hero__actions {
+        justify-content: center;
+    }
+
+    .hero__image {
+        object-position: 80% top;
+        /* Shows the baby's face on mobile */
+    }
+}

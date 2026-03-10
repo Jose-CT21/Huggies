@@ -1,0 +1,6 @@
+/* Container for the app is standard */
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}

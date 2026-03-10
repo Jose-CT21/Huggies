@@ -1,0 +1,15 @@
+.ui-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-glass);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.ui-card:hover {
+    box-shadow: var(--shadow-lg);
+    background: var(--color-bg-white);
+}
