@@ -3,7 +3,7 @@ export const dummyData = {
         headline: "Cuidado premium para la piel de tu bebé",
         subheadline: "Descubre nuestra nueva línea de pañales con materiales súper suaves y máxima protección contra filtraciones.",
         cta: "Comprar Ahora",
-        image: "https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&q=80&w=1080"
+        image: "/hero_bg.png"
     },
     categories: [
         {
