@@ -7,7 +7,7 @@
 
 .community-hero {
     position: relative;
-    background-image: url('/community_hero_bg.png');
+    background-image: url('/community_hero_new.png');
     background-size: cover;
     background-position: center 30%;
     color: white;
@@ -24,7 +24,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, rgba(0, 51, 153, 0.85) 0%, rgba(0, 92, 230, 0.6) 100%);
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.2) 100%);
     z-index: 1;
 }
 
@@ -37,13 +37,17 @@
 .community-hero h1 {
     font-size: 2.5rem;
     margin-bottom: 15px;
+    color: #FFFFFF !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .community-hero p {
     font-size: 1.1rem;
     max-width: 600px;
     margin: 0 auto;
-    opacity: 0.95;
+    opacity: 1;
+    color: #EEEEEE !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
 .community-layout {

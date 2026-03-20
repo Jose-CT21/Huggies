@@ -1,12 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from '../ui/Button';
+import CartIcon from '../ui/icons/CartIcon';
+import StarIcon from '../ui/icons/StarIcon';
+import { useAuth } from '../../context/AuthContext';
+import { useCart } from '../../context/CartContext';
 import './Navbar.css';
 
 const Navbar = () => {
     const [scrolled, setScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const navigate = useNavigate();
+    const { isAuthenticated, logout } = useAuth();
+    const { cartItems, pointsBalance, toggleCart } = useCart();
+
+    const cartItemsCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -50,8 +58,26 @@ const Navbar = () => {
                     </div>
 
                     <div className="navbar__actions">
-                        <Button variant="outline" size="small" onClick={() => { navigate('/login'); closeMobileMenu(); }}>Ingresar</Button>
-                        <Button variant="primary" size="small" onClick={() => { navigate('/products'); closeMobileMenu(); }}>Comprar</Button>
+                        {isAuthenticated ? (
+                            <div className="rewards-badge" title="Tus puntos Huggies Rewards" onClick={() => navigate('/#recompensas')}>
+                                <StarIcon size={18} /> {pointsBalance} pts
+                            </div>
+                        ) : (
+                            <div className="rewards-badge" title="Inicia sesión para ver tus puntos" onClick={() => navigate('/login')}>
+                                <StarIcon size={18} /> ¡Únete y Gana!
+                            </div>
+                        )}
+                        
+                        <button className="cart-btn" onClick={toggleCart} title="Ver carrito">
+                            <CartIcon size={26} />
+                            {cartItemsCount > 0 && <span className="cart-count">{cartItemsCount}</span>}
+                        </button>
+                        
+                        {isAuthenticated ? (
+                            <Button variant="outline" size="small" onClick={() => { logout(); closeMobileMenu(); }}>Salir</Button>
+                        ) : (
+                            <Button variant="outline" size="small" onClick={() => { navigate('/login'); closeMobileMenu(); }}>Ingresar</Button>
+                        )}
                     </div>
                 </div>
             </div>

@@ -194,14 +194,14 @@
     position: absolute;
     top: 12px;
     right: 12px;
-    background: var(--color-accent);
+    background-color: #E63946;
     color: white;
     padding: 4px 10px;
     border-radius: 20px;
     font-size: 0.8rem;
     font-weight: 700;
     text-transform: uppercase;
-    box-shadow: 0 4px 8px rgba(255, 107, 107, 0.3);
+    box-shadow: 0 4px 8px rgba(230, 57, 70, 0.3);
 }
 
 .product-content {

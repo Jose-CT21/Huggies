@@ -2,6 +2,8 @@ import React, { Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
+import CartModal from './components/ui/CartModal';
+import ScrollToTopButton from './components/ui/ScrollToTopButton';
 
 // Lazy loaded pages for performance optimization
 const Home = lazy(() => import('./pages/Home'));
@@ -33,6 +35,8 @@ function App() {
         </Suspense>
       </main>
       <Footer />
+      <CartModal />
+      <ScrollToTopButton />
     </div>
   );
 }

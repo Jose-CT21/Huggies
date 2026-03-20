@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Button from '../components/ui/Button';
+import { useAuth } from '../context/AuthContext';
 import './Login.css';
 
 const Login = () => {
     const [isLogin, setIsLogin] = useState(true);
+    const navigate = useNavigate();
+    const { login } = useAuth();
 
     const [formData, setFormData] = useState({
         name: '',
@@ -102,7 +105,8 @@ const Login = () => {
             return;
         }
 
-        console.log(isLogin ? 'Iniciando sesión con:' : 'Registrando usuario:', formData);
+        login();
+        navigate('/');
     };
 
     return (

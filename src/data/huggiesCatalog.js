@@ -8,7 +8,7 @@ export const huggiesCatalog = [
         description: 'Nuestra mejor protección y cuidado para la piel de tu bebé.',
         price: 350.00,
         discountPrice: 299.00,
-        image: 'https://placehold.co/400x400/e6f2ff/004d99?text=Supreme+Care+RN',
+        image: '/product_images/supreme_care.png',
         features: ['Absorción especial', 'Cubierta extra suave', 'Indicador de humedad']
     },
     {
@@ -20,7 +20,7 @@ export const huggiesCatalog = [
         description: 'Nuestra mejor protección y cuidado para la piel de tu bebé.',
         price: 360.00,
         discountPrice: null,
-        image: 'https://placehold.co/400x400/e6f2ff/004d99?text=Supreme+Care+P',
+        image: '/product_images/supreme_care.png',
         features: ['Absorción especial', 'Cubierta extra suave']
     },
     {
@@ -32,7 +32,7 @@ export const huggiesCatalog = [
         description: 'Nuestra mejor protección y cuidado para la piel de tu bebé.',
         price: 400.00,
         discountPrice: null,
-        image: 'https://placehold.co/400x400/e6f2ff/004d99?text=Supreme+Care+M',
+        image: '/product_images/supreme_care.png',
         features: ['Absorción especial', 'Cubierta extra suave', 'Ajuste perfecto']
     },
     {
@@ -44,7 +44,7 @@ export const huggiesCatalog = [
         description: 'Nuestra mejor protección y cuidado para la piel de tu bebé.',
         price: 450.00,
         discountPrice: null,
-        image: 'https://placehold.co/400x400/e6f2ff/004d99?text=Supreme+Care+G',
+        image: '/product_images/supreme_care.png',
         features: ['Absorción especial', 'Cubierta extra suave', 'Libertad de movimiento']
     },
     {
@@ -56,7 +56,7 @@ export const huggiesCatalog = [
         description: 'Nuestra mejor protección y cuidado para la piel de tu bebé.',
         price: 490.00,
         discountPrice: 450.00,
-        image: 'https://placehold.co/400x400/e6f2ff/004d99?text=Supreme+Care+XG',
+        image: '/product_images/supreme_care.png',
         features: ['Absorción especial', 'Cubierta extra suave']
     },
     {
@@ -68,7 +68,7 @@ export const huggiesCatalog = [
         description: 'Nuestra mejor protección y cuidado para la piel de tu bebé.',
         price: 520.00,
         discountPrice: null,
-        image: 'https://placehold.co/400x400/e6f2ff/004d99?text=Supreme+Care+XXG',
+        image: '/product_images/supreme_care.png',
         features: ['Absorción especial', 'Cubierta extra suave', 'Máxima protección']
     },
     {
@@ -80,7 +80,7 @@ export const huggiesCatalog = [
         description: 'Protección con ajuste anatómico para que tu bebé descubra el mundo.',
         price: 350.00,
         discountPrice: null,
-        image: 'https://placehold.co/400x400/ccffcc/006600?text=Active+Sec+M',
+        image: '/product_images/active_sec.png',
         features: ['Ajuste anatómico', 'Hasta 12 hrs de protección']
     },
     {
@@ -92,7 +92,7 @@ export const huggiesCatalog = [
         description: 'Protección con ajuste anatómico para que tu bebé descubra el mundo.',
         price: 380.00,
         discountPrice: 320.00,
-        image: 'https://placehold.co/400x400/ccffcc/006600?text=Active+Sec+G',
+        image: '/product_images/active_sec.png',
         features: ['Ajuste anatómico', 'Hasta 12 hrs de protección']
     },
     {
@@ -104,7 +104,7 @@ export const huggiesCatalog = [
         description: 'Fáciles de poner y quitar, con ajuste 360.',
         price: 450.00,
         discountPrice: null,
-        image: 'https://placehold.co/400x400/ffffcc/cca300?text=Active+Sec+Pants+G',
+        image: '/product_images/active_sec_pants.png',
         features: ['Fácil cambio', 'Ajuste 360', 'Divertidos diseños']
     },
     {
@@ -116,7 +116,7 @@ export const huggiesCatalog = [
         description: 'Limpieza superior y delicada para la piel de tu bebé.',
         price: 150.00,
         discountPrice: 120.00,
-        image: 'https://placehold.co/400x400/ffe6e6/990000?text=Toallitas+Supreme+Care',
+        image: '/product_images/wipes.png',
         features: ['Libres de fragancia', 'Hipoalergénicas', 'Con fibras naturales']
     },
     {
@@ -128,7 +128,7 @@ export const huggiesCatalog = [
         description: 'Para una limpieza efectiva en cada cambio de pañal.',
         price: 110.00,
         discountPrice: null,
-        image: 'https://placehold.co/400x400/ffe6e6/990000?text=Toallitas+Limpieza+Cotidiana',
+        image: '/product_images/wipes.png',
         features: ['Aroma suave', 'Dermatológicamente testadas']
     }
 ];

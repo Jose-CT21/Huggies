@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import { useCart } from '../context/CartContext';
 import { huggiesCatalog, productSizes, productTypes } from '../data/huggiesCatalog';
 import './Products.css';
 
@@ -11,6 +12,8 @@ const Products = () => {
         size: 'Todos',
         search: ''
     });
+
+    const { addToCart } = useCart();
 
     useEffect(() => {
         let result = huggiesCatalog;
@@ -160,7 +163,7 @@ const Products = () => {
                                                 )}
                                             </div>
 
-                                            <Button variant="primary" className="add-to-cart-btn">
+                                            <Button variant="primary" className="add-to-cart-btn" onClick={() => addToCart(product)}>
                                                 Agregar al Carrito
                                             </Button>
                                         </div>
