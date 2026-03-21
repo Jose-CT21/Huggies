@@ -53,13 +53,13 @@ const Navbar = () => {
                     <div className="navbar__links">
                         <Link to="/products" onClick={closeMobileMenu}>Productos</Link>
                         <a href="/#beneficios" onClick={closeMobileMenu}>Beneficios</a>
-                        <a href="/#recompensas" onClick={closeMobileMenu}>Recompensas</a>
+                        <Link to="/recompensas" onClick={closeMobileMenu}>Recompensas</Link>
                         <Link to="/comunidad" onClick={closeMobileMenu}>Comunidad</Link>
                     </div>
 
                     <div className="navbar__actions">
                         {isAuthenticated ? (
-                            <div className="rewards-badge" title="Tus puntos Huggies Rewards" onClick={() => navigate('/#recompensas')}>
+                            <div className="rewards-badge" title="Tus puntos Huggies Rewards" onClick={() => navigate('/recompensas')}>
                                 <StarIcon size={18} /> {pointsBalance} pts
                             </div>
                         ) : (

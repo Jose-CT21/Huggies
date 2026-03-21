@@ -60,7 +60,13 @@ button {
 
 /* Sections */
 section {
-    padding: var(--spacing-4xl) 0;
+    padding: var(--spacing-2xl) 0;
+}
+
+@media (min-width: 768px) {
+    section {
+        padding: var(--spacing-4xl) 0;
+    }
 }
 
 .section-title {

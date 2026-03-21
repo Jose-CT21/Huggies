@@ -97,6 +97,7 @@ export const CartProvider = ({ children }) => {
             cartItems,
             pointsBalance,
             isCartOpen,
+            setIsCartOpen,
             addToCart,
             removeFromCart,
             updateQuantity,

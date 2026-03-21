@@ -33,10 +33,11 @@
     background-color: var(--color-accent);
 }
 
-@media (max-width: 768px) {
+/* Mobile / Tablet (when BottomNav is visible) */
+@media (max-width: 900px) {
     .scroll-to-top-btn {
-        bottom: 20px;
-        right: 20px;
+        bottom: 85px; /* Clear the BottomNav */
+        right: 15px;
         width: 45px;
         height: 45px;
     }

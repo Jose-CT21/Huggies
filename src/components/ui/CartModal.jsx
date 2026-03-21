@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import Button from './Button';
@@ -6,9 +7,16 @@ import StarIcon from './icons/StarIcon';
 import './CartModal.css';
 
 const CartModal = () => {
-    const { isCartOpen, toggleCart, cartItems, removeFromCart, updateQuantity, getCartTotal, checkout, pointsBalance } = useCart();
+    const { isCartOpen, toggleCart, cartItems, removeFromCart, updateQuantity, getCartTotal, checkout, pointsBalance, setIsCartOpen } = useCart();
     const { isAuthenticated } = useAuth();
     const [usePoints, setUsePoints] = useState(0);
+    const location = useLocation();
+
+    useEffect(() => {
+        if (isCartOpen) {
+            setIsCartOpen(false);
+        }
+    }, [location.pathname, setIsCartOpen]);
 
     if (!isCartOpen) return null;
 

@@ -325,6 +325,39 @@
     }
 
     .products-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .product-image {
+        padding: 10px;
+        height: 140px;
+    }
+
+    .product-content {
+        padding: 12px;
+    }
+
+    .product-name {
+        font-size: 1rem;
+    }
+
+    .current-price {
+        font-size: 1.1rem;
+    }
+    
+    .product-desc {
+        font-size: 0.85rem;
+        margin-bottom: 12px;
+    }
+
+    .add-to-cart-btn {
+        padding: 8px;
+        font-size: 0.85rem;
+    }
+
+    .discount-badge {
+        padding: 2px 6px;
+        font-size: 0.65rem;
     }
 }
