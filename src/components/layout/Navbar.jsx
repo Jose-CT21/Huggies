@@ -55,6 +55,7 @@ const Navbar = () => {
                         <a href="/#beneficios" onClick={closeMobileMenu}>Beneficios</a>
                         <Link to="/recompensas" onClick={closeMobileMenu}>Recompensas</Link>
                         <Link to="/comunidad" onClick={closeMobileMenu}>Comunidad</Link>
+                        <Link to="/donde-comprar" onClick={closeMobileMenu}>Dónde Comprar</Link>
                     </div>
 
                     <div className="navbar__actions">
@@ -67,12 +68,12 @@ const Navbar = () => {
                                 <StarIcon size={18} /> ¡Únete y Gana!
                             </div>
                         )}
-                        
+
                         <button className="cart-btn" onClick={toggleCart} title="Ver carrito">
                             <CartIcon size={26} />
                             {cartItemsCount > 0 && <span className="cart-count">{cartItemsCount}</span>}
                         </button>
-                        
+
                         {isAuthenticated ? (
                             <Button variant="outline" size="small" onClick={() => { logout(); closeMobileMenu(); }}>Salir</Button>
                         ) : (

@@ -127,6 +127,24 @@
     border-color: var(--color-primary);
 }
 
+/* Animated filter section entrance */
+.filter-section-animated {
+    animation: filterSlideIn 0.3s ease-out;
+}
+
+@keyframes filterSlideIn {
+    from {
+        opacity: 0;
+        max-height: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        max-height: 300px;
+        transform: translateY(0);
+    }
+}
+
 .clear-filters-btn {
     width: 100%;
     margin-top: 10px;
@@ -361,3 +379,186 @@
         font-size: 0.65rem;
     }
 }
+
+/* Recommended Products Section - Premium Highlights */
+.recommended-products-section {
+    background: linear-gradient(135deg, rgba(2, 136, 209, 0.03) 0%, rgba(211, 47, 47, 0.03) 100%);
+    border: 1.5px solid rgba(2, 136, 209, 0.1);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 32px;
+    box-shadow: var(--shadow-sm);
+}
+
+.rec-section-header {
+    margin-bottom: 20px;
+}
+
+.rec-section-badge {
+    display: inline-block;
+    background-color: var(--color-secondary);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+}
+
+.rec-section-title-area h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--color-text-main);
+}
+
+.rec-section-title-area h2 strong {
+    color: var(--color-primary);
+}
+
+.rec-section-title-area p {
+    font-size: 0.88rem;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+}
+
+.recommended-products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.rec-product-card-highlight {
+    border: 2px solid rgba(2, 136, 209, 0.15) !important;
+}
+
+.rec-product-card-highlight:hover {
+    border-color: var(--color-secondary) !important;
+    box-shadow: 0 10px 25px rgba(2, 136, 209, 0.12) !important;
+}
+
+.rec-card-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background-color: var(--color-secondary);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    box-shadow: 0 4px 8px rgba(2, 136, 209, 0.25);
+}
+
+/* Feedback Widget for recommended section */
+.recommended-feedback-container {
+    border-top: 1px dashed rgba(0, 0, 0, 0.1);
+    padding-top: 16px;
+    margin-top: 8px;
+}
+
+.recommended-feedback-prompt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+@media (min-width: 640px) {
+    .recommended-feedback-prompt {
+        flex-direction: row;
+    }
+}
+
+.recommended-feedback-prompt span {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-main);
+}
+
+.feedback-btn-group {
+    display: flex;
+    gap: 8px;
+}
+
+.feedback-sub-btn {
+    padding: 6px 14px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    border-radius: 20px;
+    border: 1.5px solid #D1D5DB;
+    background-color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+}
+
+.feedback-sub-btn:hover {
+    transform: translateY(-1px);
+}
+
+.yes-btn:hover {
+    border-color: #059669;
+    color: #059669;
+    background-color: rgba(5, 150, 105, 0.05);
+}
+
+.no-btn:hover {
+    border-color: #DC2626;
+    color: #DC2626;
+    background-color: rgba(220, 38, 38, 0.05);
+}
+
+.recommended-feedback-submitted {
+    text-align: center;
+    color: #047857;
+    background-color: rgba(5, 150, 105, 0.04);
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    animation: fadeIn 0.4s ease;
+}
+
+/* Guest user recommendations promo banner */
+.recommended-products-promo {
+    background: linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%);
+    border: 1px solid #D1D5DB;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+@media (min-width: 768px) {
+    .recommended-products-promo {
+        flex-direction: row;
+        align-items: center;
+        padding: 20px 32px;
+    }
+}
+
+.promo-text h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-text-main);
+    margin-bottom: 2px;
+}
+
+.promo-text p {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+}
+
+.recommended-products-promo button {
+    flex-shrink: 0;
+}

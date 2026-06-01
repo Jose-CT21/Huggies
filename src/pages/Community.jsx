@@ -1,230 +1,475 @@
-import React, { useState } from 'react';
-import Button from '../components/ui/Button';
-import Card from '../components/ui/Card';
+import React, { useState, useRef } from 'react';
 import { initialPosts, postCategories } from '../data/communityData';
 import './Community.css';
 
+/* ─────────────────────────────────────────────
+   CREATE POST BOX
+───────────────────────────────────────────── */
+const CreatePostBox = ({ onPost }) => {
+    const [expanded, setExpanded] = useState(false);
+    const [text, setText] = useState('');
+    const [category, setCategory] = useState('');
+    const [images, setImages] = useState([]);   // [{url, file}]
+    const fileRef = useRef();
+
+    const handleImagePick = (e) => {
+        const files = Array.from(e.target.files);
+        const previews = files.map(f => ({ url: URL.createObjectURL(f), file: f }));
+        setImages(prev => [...prev, ...previews].slice(0, 4));
+    };
+
+    const removeImage = (idx) => setImages(prev => prev.filter((_, i) => i !== idx));
+
+    const canPost = text.trim().length > 0 && category !== '';
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!canPost) return;
+        onPost({
+            text,
+            category,
+            images: images.map(i => i.url),
+        });
+        setText('');
+        setCategory('');
+        setImages([]);
+        setExpanded(false);
+    };
+
+    return (
+        <div className="create-post-box">
+            {/* Collapsed trigger */}
+            {!expanded && (
+                <div className="cp-trigger" onClick={() => setExpanded(true)}>
+                    <img className="cp-avatar" src="https://i.pravatar.cc/150?u=me" alt="Tú" />
+                    <div className="cp-fake-input">¿Qué está pasando con tu bebé? 👶</div>
+                </div>
+            )}
+
+            {/* Expanded form */}
+            {expanded && (
+                <form className="cp-form" onSubmit={handleSubmit}>
+                    <div className="cp-form-header">
+                        <h3>Crear publicación</h3>
+                        <button type="button" className="cp-close" onClick={() => setExpanded(false)}>✕</button>
+                    </div>
+
+                    {/* Category */}
+                    <select
+                        className="cp-select"
+                        value={category}
+                        onChange={e => setCategory(e.target.value)}
+                        required
+                    >
+                        <option value="" disabled>Selecciona un tema…</option>
+                        {postCategories.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+
+                    {/* Text */}
+                    <textarea
+                        className="cp-textarea"
+                        placeholder="Comparte un tip, duda o recomendación…"
+                        value={text}
+                        onChange={e => setText(e.target.value)}
+                        rows={4}
+                        autoFocus
+                    />
+
+                    {/* Image previews */}
+                    {images.length > 0 && (
+                        <div className={`cp-image-grid cols-${Math.min(images.length, 2)}`}>
+                            {images.map((img, i) => (
+                                <div key={i} className="cp-image-preview">
+                                    <img src={img.url} alt="" />
+                                    <button type="button" className="cp-remove-img" onClick={() => removeImage(i)}>✕</button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Toolbar */}
+                    <div className="cp-toolbar">
+                        <div className="cp-tools">
+                            <button
+                                type="button"
+                                className="cp-tool-btn"
+                                title="Agregar foto"
+                                onClick={() => fileRef.current.click()}
+                            >
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="3"/>
+                                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                                    <polyline points="21 15 16 10 5 21"/>
+                                </svg>
+                                <span>Foto</span>
+                            </button>
+                            <input
+                                ref={fileRef}
+                                type="file"
+                                accept="image/*"
+                                multiple
+                                hidden
+                                onChange={handleImagePick}
+                            />
+                            <button type="button" className="cp-tool-btn" title="Sentimiento">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                                    <line x1="9" y1="9" x2="9.01" y2="9"/>
+                                    <line x1="15" y1="9" x2="15.01" y2="9"/>
+                                </svg>
+                                <span>Emoción</span>
+                            </button>
+                        </div>
+                        <button
+                            type="submit"
+                            className={`cp-publish-btn ${!canPost ? 'disabled' : ''}`}
+                            disabled={!canPost}
+                        >
+                            Publicar
+                        </button>
+                    </div>
+                </form>
+            )}
+        </div>
+    );
+};
+
+/* ─────────────────────────────────────────────
+   COMMENTS SECTION
+───────────────────────────────────────────── */
+const CommentsSection = ({ postId }) => {
+    const [comments, setComments] = useState([]);
+    const [text, setText] = useState('');
+
+    const handleAdd = (e) => {
+        e.preventDefault();
+        if (!text.trim()) return;
+        setComments(prev => [
+            ...prev,
+            {
+                id: Date.now(),
+                author: 'Tú (María Pérez)',
+                avatar: 'https://i.pravatar.cc/150?u=me',
+                text: text.trim(),
+                time: 'Ahora mismo',
+                likes: 0,
+            },
+        ]);
+        setText('');
+    };
+
+    return (
+        <div className="comments-section">
+            {/* Existing comments */}
+            {comments.length > 0 && (
+                <div className="comments-list">
+                    {comments.map(c => (
+                        <div key={c.id} className="comment-item">
+                            <img src={c.avatar} alt={c.author} className="comment-avatar" />
+                            <div className="comment-bubble">
+                                <span className="comment-author">{c.author}</span>
+                                <p className="comment-text">{c.text}</p>
+                                <div className="comment-meta">
+                                    <span>{c.time}</span>
+                                    <button className="comment-like-btn">Me sirvió · {c.likes}</button>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {/* Input */}
+            <form className="comment-form" onSubmit={handleAdd}>
+                <img src="https://i.pravatar.cc/150?u=me" alt="Tú" className="comment-avatar" />
+                <div className="comment-input-wrap">
+                    <input
+                        type="text"
+                        className="comment-input"
+                        placeholder="Escribe un comentario…"
+                        value={text}
+                        onChange={e => setText(e.target.value)}
+                    />
+                    {text.trim() && (
+                        <button type="submit" className="comment-send-btn" aria-label="Enviar">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                <line x1="22" y1="2" x2="11" y2="13"/>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                            </svg>
+                        </button>
+                    )}
+                </div>
+            </form>
+        </div>
+    );
+};
+
+/* ─────────────────────────────────────────────
+   POST CARD
+───────────────────────────────────────────── */
+const PostCard = ({ post }) => {
+    const [liked, setLiked] = useState(false);
+    const [likes, setLikes] = useState(post.likes);
+    const [showComments, setShowComments] = useState(false);
+
+    const handleLike = () => {
+        setLiked(prev => !prev);
+        setLikes(prev => liked ? prev - 1 : prev + 1);
+    };
+
+    const catClass = post.category.replace(/\s+/g, '-').toLowerCase();
+
+    return (
+        <div className="post-card">
+            {/* Header */}
+            <div className="post-header">
+                <img src={post.author.avatar} alt={post.author.name} className="post-avatar" />
+                <div className="post-author-info">
+                    <div className="post-author-name">
+                        {post.author.name}
+                        {post.author.isPremium && <span className="premium-badge">✦ Plus</span>}
+                    </div>
+                    <div className="post-meta">
+                        <span>{post.date}</span>
+                        <span>·</span>
+                        <span className={`category-tag ${catClass}`}>{post.category}</span>
+                    </div>
+                </div>
+                <button className="post-menu-btn" aria-label="Opciones">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                        <circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>
+                    </svg>
+                </button>
+            </div>
+
+            {/* Content */}
+            <div className="post-body">
+                {post.content && <p>{post.content}</p>}
+
+                {/* Images */}
+                {post.images && post.images.length > 0 && (
+                    <div className={`post-image-grid cols-${Math.min(post.images.length, 2)}`}>
+                        {post.images.map((img, i) => (
+                            <div key={i} className="post-image-cell">
+                                <img src={img} alt="" />
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* Tags */}
+                {post.tags && post.tags.length > 0 && (
+                    <div className="post-hashtags">
+                        {post.tags.map(tag => (
+                            <span key={tag} className="hashtag">#{tag.replace(/\s+/g, '')}</span>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            {/* Stats row */}
+            <div className="post-stats">
+                {likes > 0 && <span>❤️ {likes} {likes === 1 ? 'persona' : 'personas'}</span>}
+                <span
+                    className="post-stats-replies"
+                    onClick={() => setShowComments(s => !s)}
+                >
+                    💬 {post.replies} comentarios
+                </span>
+            </div>
+
+            {/* Action bar */}
+            <div className="post-actions">
+                <button
+                    className={`action-btn ${liked ? 'liked' : ''}`}
+                    onClick={handleLike}
+                >
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill={liked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                    Me sirvió
+                </button>
+                <button
+                    className={`action-btn ${showComments ? 'active' : ''}`}
+                    onClick={() => setShowComments(s => !s)}
+                >
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                    Comentar
+                </button>
+                <button className="action-btn">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                    </svg>
+                    Compartir
+                </button>
+            </div>
+
+            {/* Comments */}
+            {showComments && <CommentsSection postId={post.id} />}
+        </div>
+    );
+};
+
+/* ─────────────────────────────────────────────
+   RIGHT SIDEBAR
+───────────────────────────────────────────── */
+const SUGGESTIONS = [
+    { id: 'u1', name: 'Patricia Vela', mutual: '12 amigos en común', avatar: 'https://i.pravatar.cc/150?u=patricia' },
+    { id: 'u2', name: 'Roberto Nájera', mutual: '5 amigos en común', avatar: 'https://i.pravatar.cc/150?u=roberto' },
+    { id: 'u3', name: 'Diana Lozano', mutual: '8 amigos en común', avatar: 'https://i.pravatar.cc/150?u=diana' },
+];
+
+const RightSidebar = () => (
+    <aside className="community-right-sidebar">
+        {/* Your profile summary */}
+        <div className="sidebar-card profile-card">
+            <img src="https://i.pravatar.cc/150?u=me" alt="Tú" className="profile-card-avatar" />
+            <div>
+                <p className="profile-card-name">María Pérez</p>
+                <p className="profile-card-sub">Miembro Plus ✦</p>
+            </div>
+        </div>
+
+        {/* Suggestions */}
+        <div className="sidebar-card">
+            <h4 className="sidebar-card-title">Papás que podrías conocer</h4>
+            <div className="suggestions-list">
+                {SUGGESTIONS.map(s => (
+                    <div key={s.id} className="suggestion-item">
+                        <img src={s.avatar} alt={s.name} className="suggestion-avatar" />
+                        <div className="suggestion-info">
+                            <p className="suggestion-name">{s.name}</p>
+                            <p className="suggestion-mutual">{s.mutual}</p>
+                        </div>
+                        <button className="suggestion-follow-btn">Seguir</button>
+                    </div>
+                ))}
+            </div>
+        </div>
+
+        {/* Trending tags */}
+        <div className="sidebar-card">
+            <h4 className="sidebar-card-title">Temas populares</h4>
+            <div className="trending-tags">
+                {['HuggiesSupreme', 'TipsNocturnos', 'PrimerPañal', 'ActiveSecPants', 'Toallitas', 'BebeHuggies'].map(tag => (
+                    <span key={tag} className="trending-tag">#{tag}</span>
+                ))}
+            </div>
+        </div>
+    </aside>
+);
+
+/* ─────────────────────────────────────────────
+   MAIN PAGE
+───────────────────────────────────────────── */
 const Community = () => {
-    const [posts, setPosts] = useState(initialPosts);
+    const [posts, setPosts] = useState(
+        initialPosts.map(p => ({ ...p, images: p.images ?? [] }))
+    );
     const [activeFilter, setActiveFilter] = useState('Todos');
 
-    // Create post state
-    const [newPostContent, setNewPostContent] = useState('');
-    const [newPostCategory, setNewPostCategory] = useState('');
-    const [isCreating, setIsCreating] = useState(false);
-
-    const filteredPosts = activeFilter === 'Todos'
-        ? posts
-        : posts.filter(post => post.category === activeFilter);
-
-    const handleCreatePost = (e) => {
-        e.preventDefault();
-
-        const isFormValid = newPostContent.trim() && newPostCategory;
-        if (!isFormValid) return;
-
+    const handleNewPost = ({ text, category, images }) => {
         const newPost = {
             id: `post-${Date.now()}`,
             author: {
                 name: 'Tú (María Pérez)',
-                avatar: 'https://i.pravatar.cc/150?u=current_user',
-                isPremium: true
+                avatar: 'https://i.pravatar.cc/150?u=me',
+                isPremium: true,
             },
-            date: 'Hace un momento',
-            category: newPostCategory,
-            content: newPostContent,
+            date: 'Ahora mismo',
+            category,
+            content: text,
+            images,
             likes: 0,
             replies: 0,
-            tags: []
+            tags: [],
         };
-
-        setPosts([newPost, ...posts]);
-        setNewPostContent('');
-        setNewPostCategory(''); // Reset category after post
-        setIsCreating(false);
+        setPosts(prev => [newPost, ...prev]);
     };
 
-    const handleLikeClick = (id) => {
-        setPosts(posts.map(post => {
-            if (post.id === id) {
-                // Simple toggle simulation
-                const isLiked = post.userLiked;
-                return {
-                    ...post,
-                    likes: isLiked ? post.likes - 1 : post.likes + 1,
-                    userLiked: !isLiked
-                };
-            }
-            return post;
-        }));
-    };
-
-    const isFormValid = newPostContent.trim() && newPostCategory;
-    let helperMessage = '';
-    if (!newPostCategory) {
-        helperMessage = 'Por favor, selecciona un tema para tu publicación.';
-    } else if (!newPostContent.trim()) {
-        helperMessage = 'Por favor, escribe un mensaje descriptivo.';
-    }
+    const filtered = activeFilter === 'Todos'
+        ? posts
+        : posts.filter(p => p.category === activeFilter);
 
     return (
         <div className="community-page">
+            {/* Hero */}
             <div className="community-hero">
                 <h1>Comunidad Huggies</h1>
-                <p>El lugar perfecto para compartir experiencias, consejos y resolver tus dudas con otros padres.</p>
+                <p>El lugar para compartir, aprender y conectar con otros papás 💛</p>
             </div>
 
-            <div className="container community-layout">
-                {/* Main Feed Sidebar / Actions */}
-                <div className="community-sidebar">
-                    <Card className="create-post-prompt">
-                        <img src="https://i.pravatar.cc/150?u=current_user" alt="Tu avatar" className="user-avatar" />
-                        <button
-                            className="fake-input-btn"
-                            onClick={() => setIsCreating(true)}
-                        >
-                            ¿Tienes algún tip o duda que compartir?
-                        </button>
-                    </Card>
-
-                    <div className="community-filters">
-                        <h3>Categorías</h3>
-                        <br />
-                        <button
-                            className={`filter-pill ${activeFilter === 'Todos' ? 'active' : ''}`}
-                            onClick={() => setActiveFilter('Todos')}
-                        >
-                            Todos los temas
-                        </button>
-                        {postCategories.map(category => (
-                            <button
-                                key={category}
-                                className={`filter-pill ${activeFilter === category ? 'active' : ''}`}
-                                onClick={() => setActiveFilter(category)}
-                            >
-                                {category}
-                            </button>
-                        ))}
+            <div className="community-root container">
+                {/* Left sidebar — filters */}
+                <aside className="community-left-sidebar">
+                    <div className="sidebar-card">
+                        <img src="https://i.pravatar.cc/150?u=me" alt="Tú" className="profile-card-avatar" />
+                        <div>
+                            <p className="profile-card-name">María Pérez</p>
+                            <p className="profile-card-sub">Miembro Plus ✦</p>
+                        </div>
                     </div>
-                </div>
-
-                {/* Feed and Modals */}
-                <div className="community-feed">
-                    {/* Create Post Form (Visible when isCreating is true) */}
-                    {isCreating && (
-                        <Card className="create-post-form-card">
-                            <form onSubmit={handleCreatePost}>
-                                <div className="create-post-header">
-                                    <h3>Crear Publicación</h3>
-                                    <button
-                                        type="button"
-                                        className="close-btn"
-                                        onClick={() => setIsCreating(false)}
-                                    >
-                                        &times;
-                                    </button>
-                                </div>
-
-                                <select
-                                    className="post-category-select"
-                                    value={newPostCategory}
-                                    onChange={(e) => setNewPostCategory(e.target.value)}
-                                    required
+                    <div className="sidebar-card filter-card">
+                        <h4 className="sidebar-card-title">Temas</h4>
+                        <div className="filter-buttons">
+                            <button
+                                className={`filter-pill ${activeFilter === 'Todos' ? 'active' : ''}`}
+                                onClick={() => setActiveFilter('Todos')}
+                            >
+                                🏠 Todos los temas
+                            </button>
+                            {postCategories.map(cat => (
+                                <button
+                                    key={cat}
+                                    className={`filter-pill ${activeFilter === cat ? 'active' : ''}`}
+                                    onClick={() => setActiveFilter(cat)}
                                 >
-                                    <option value="" disabled>Selecciona un tema...</option>
-                                    {postCategories.map(cat => (
-                                        <option key={cat} value={cat}>{cat}</option>
-                                    ))}
-                                </select>
+                                    {cat === 'Tips de Padres' ? '💡' : cat === 'Dudas' ? '❓' : '⭐'} {cat}
+                                </button>
+                            ))}
+                        </div>
+                        <select
+                            className="filter-dropdown"
+                            value={activeFilter}
+                            onChange={(e) => setActiveFilter(e.target.value)}
+                        >
+                            <option value="Todos">🏠 Todos los temas</option>
+                            {postCategories.map(cat => (
+                                <option key={cat} value={cat}>
+                                    {cat === 'Tips de Padres' ? '💡 ' : cat === 'Dudas' ? '❓ ' : '⭐ '}
+                                    {cat}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </aside>
 
-                                <textarea
-                                    className="post-textarea"
-                                    placeholder="Escribe tu mensaje aquí..."
-                                    value={newPostContent}
-                                    onChange={(e) => setNewPostContent(e.target.value)}
-                                    rows={4}
-                                    autoFocus
-                                />
+                {/* Main feed */}
+                <main className="community-feed">
+                    {/* Create post */}
+                    <CreatePostBox onPost={handleNewPost} />
 
-                                <div className="create-post-footer">
-                                    {!isFormValid && (
-                                        <span className="post-helper-text">{helperMessage}</span>
-                                    )}
-                                    <div className="create-post-actions">
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            onClick={() => setIsCreating(false)}
-                                        >
-                                            Cancelar
-                                        </Button>
-                                        <Button
-                                            type="submit"
-                                            variant="primary"
-                                            disabled={!isFormValid}
-                                        >
-                                            Publicar
-                                        </Button>
-                                    </div>
-                                </div>
-                            </form>
-                        </Card>
-                    )}
-
-                    {/* Posts Flow */}
-                    <div className="posts-container">
-                        {filteredPosts.length > 0 ? (
-                            filteredPosts.map(post => (
-                                <Card key={post.id} className="post-card">
-                                    <div className="post-header">
-                                        <img src={post.author.avatar} alt={post.author.name} className="post-avatar" />
-                                        <div className="post-author-info">
-                                            <h4>
-                                                {post.author.name}
-                                                {post.author.isPremium && <span className="premium-badge" title="Miembro Plus">✦</span>}
-                                            </h4>
-                                            <span className="post-meta">{post.date} • <span className={`category-tag ${post.category.replace(/\s+/g, '-').toLowerCase()}`}>{post.category}</span></span>
-                                        </div>
-                                    </div>
-
-                                    <div className="post-body">
-                                        <p>{post.content}</p>
-                                        {post.tags && post.tags.length > 0 && (
-                                            <div className="post-hashtags">
-                                                {post.tags.map(tag => (
-                                                    <span key={`${post.id}-${tag}`} className="hashtag">#{tag.replace(/\s+/g, '')}</span>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div className="post-footer">
-                                        <button
-                                            className={`action-btn ${post.userLiked ? 'liked' : ''}`}
-                                            onClick={() => handleLikeClick(post.id)}
-                                        >
-                                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                                            </svg>
-                                            Sí me sirvió ({post.likes})
-                                        </button>
-                                        <button className="action-btn">
-                                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2">
-                                                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
-                                            </svg>
-                                            Responder ({post.replies})
-                                        </button>
-                                    </div>
-                                </Card>
-                            ))
+                    {/* Posts */}
+                    <div className="posts-list">
+                        {filtered.length > 0 ? (
+                            filtered.map(post => <PostCard key={post.id} post={post} />)
                         ) : (
                             <div className="no-posts">
+                                <div className="no-posts-icon">🌟</div>
                                 <p>No hay publicaciones en esta categoría aún.</p>
-                                <Button variant="primary" onClick={() => setIsCreating(true)}>¡Sé el primero en compartir algo!</Button>
+                                <p>¡Sé el primero en compartir algo!</p>
                             </div>
                         )}
                     </div>
-                </div>
+                </main>
+
+                {/* Right sidebar */}
+                <RightSidebar />
             </div>
         </div>
     );

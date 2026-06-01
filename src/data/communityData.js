@@ -8,10 +8,13 @@ export const initialPosts = [
         },
         date: 'Hace 2 horas',
         category: 'Tips de Padres',
-        content: 'Descubrí que poner un poco de música suave y mantener una luz muy tenue durante el cambio de pañal nocturno ayuda muchísimo a que el bebé no se desvele. ¡Desde que lo hago, mi niña vuelve a dormir casi enseguida!',
+        content: 'Descubrí que poner música suave y una luz muy tenue durante el cambio nocturno ayuda a que el bebé no se desvele. ¡Desde que lo hago, mi niña vuelve a dormir casi enseguida! 🌙',
+        images: [
+            'https://images.unsplash.com/photo-1555252333-9f8e92e65df9?w=600&q=80',
+        ],
         likes: 124,
         replies: 15,
-        tags: ['Huggies Supreme Care', 'Sueño']
+        tags: ['HuggiesSupremeCare', 'Sueño']
     },
     {
         id: 'post-2',
@@ -22,7 +25,8 @@ export const initialPosts = [
         },
         date: 'Ayer',
         category: 'Dudas',
-        content: 'Hola comunidad, soy papá primerizo. Mi bebé tiene 3 semanas y he notado que la talla RN le está quedando algo justa en las piernitas, pero aún pesa 3.5kg. ¿Debería pasar a la talla P (Pequeño) o esperar un poco más?',
+        content: 'Hola comunidad, soy papá primerizo 😅. Mi bebé tiene 3 semanas y la talla RN le está quedando algo justa en las piernitas, pero aún pesa 3.5 kg. ¿Paso a talla P o espero?',
+        images: [],
         likes: 45,
         replies: 28,
         tags: ['Pañales', 'Tallas']
@@ -36,10 +40,14 @@ export const initialPosts = [
         },
         date: 'Ayer',
         category: 'Recomendaciones',
-        content: '¡No puedo recomendar lo suficiente los Huggies Active Sec Pants! Mi niño de 1 año no se queda quieto ni un segundo al cambiarlo. Con los pants es solo subir y listo, literalmente me cambió la vida. Si tienen bebés inquietos, tienen que probarlos.',
+        content: '¡No puedo recomendar lo suficiente los Huggies Active Sec Pants! Mi niño de 1 año no se queda quieto ni un segundo. Con los pants es solo subir y listo 🙌',
+        images: [
+            'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=600&q=80',
+            'https://images.unsplash.com/photo-1561154464-82e9adf32764?w=600&q=80',
+        ],
         likes: 312,
         replies: 42,
-        tags: ['Active Sec Pants', 'Movimiento']
+        tags: ['ActiveSecPants', 'Movimiento']
     },
     {
         id: 'post-4',
@@ -50,7 +58,8 @@ export const initialPosts = [
         },
         date: 'Hace 3 días',
         category: 'Recomendaciones',
-        content: 'Para la pañalera siempre llevo dos paquetes pequeños de toallitas húmedas Limpieza Cotidiana. Huelen delicioso y son súper resistentes (las uso hasta para limpiarle las manitas después del parque).',
+        content: 'Para la pañalera siempre llevo dos paquetes pequeños de toallitas húmedas Limpieza Cotidiana. Huelen increíble y son súper resistentes 💛',
+        images: [],
         likes: 89,
         replies: 5,
         tags: ['Toallitas']
@@ -64,10 +73,13 @@ export const initialPosts = [
         },
         date: 'Hace 1 semana',
         category: 'Tips de Padres',
-        content: 'Un tip que me dio mi pediatra y me salvó: si hay derrames constantes por la espalda, asegúrense de que las aletitas internas de las piernas del pañal estén bien sacadas hacia afuera y de ajustar la cintura apuntando ligeramente hacia abajo.',
+        content: 'Un tip que me dio mi pediatra y me salvó: si hay derrames por la espalda, asegúrense de que las aletitas internas del pañal estén bien hacia afuera y ajusten la cintura apuntando ligeramente hacia abajo 💡',
+        images: [
+            'https://images.unsplash.com/photo-1504439468489-c8920d796a29?w=600&q=80',
+        ],
         likes: 540,
         replies: 112,
-        tags: ['Derrames', 'Supreme Care']
+        tags: ['Derrames', 'SupremeCare']
     }
 ];
 

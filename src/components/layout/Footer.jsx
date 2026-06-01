@@ -1,7 +1,13 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import './Footer.css';
 
 const Footer = () => {
+    const handleContactClick = (e) => {
+        e.preventDefault();
+        window.dispatchEvent(new CustomEvent('open-huggies-chat'));
+    };
+
     return (
         <footer className="footer">
             <div className="container footer__inner">
@@ -13,21 +19,21 @@ const Footer = () => {
                 <div className="footer__links">
                     <div className="footer__column">
                         <h3>Productos</h3>
-                        <a href="#">Pañales Recién Nacido</a>
-                        <a href="#">Pañales Activos</a>
-                        <a href="#">Toallitas Húmedas</a>
-                        <a href="#">Pantalones Entrenadores</a>
+                        <Link to="/products">Pañales Recién Nacido</Link>
+                        <Link to="/products">Pañales Activos</Link>
+                        <Link to="/products">Toallitas Húmedas</Link>
+                        <Link to="/products">Pantalones Entrenadores</Link>
                     </div>
                     <div className="footer__column">
                         <h3>Descubre</h3>
                         <a href="#">Acerca de Huggies</a>
-                        <a href="#">Recompensas</a>
-                        <a href="#">Calculadora de Pañales</a>
+                        <Link to="/recompensas">Recompensas</Link>
+                        <Link to="/donde-comprar">Puntos de Venta</Link>
                         <a href="#">Promociones</a>
                     </div>
                     <div className="footer__column">
                         <h3>Soporte</h3>
-                        <a href="#">Contáctanos</a>
+                        <a href="#contact" onClick={handleContactClick}>Contáctanos (Chat)</a>
                         <a href="#">Preguntas Frecuentes</a>
                         <a href="#">Privacidad</a>
                         <a href="#">Términos y Condiciones</a>

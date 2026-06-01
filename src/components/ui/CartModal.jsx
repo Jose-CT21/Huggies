@@ -6,6 +6,9 @@ import Button from './Button';
 import StarIcon from './icons/StarIcon';
 import './CartModal.css';
 
+/** Formatea un precio en colones costarricenses */
+const formatPrice = (amount) => `₡${amount.toLocaleString('es-CR')}`;
+
 const CartModal = () => {
     const { isCartOpen, toggleCart, cartItems, removeFromCart, updateQuantity, getCartTotal, checkout, pointsBalance, setIsCartOpen } = useCart();
     const { isAuthenticated } = useAuth();
@@ -26,9 +29,9 @@ const CartModal = () => {
     const handleCheckout = () => {
         const result = checkout(usePoints);
         if (isAuthenticated) {
-            alert(`¡Compra realizada con éxito!\n\nHas pagado: $${result.totalPaid.toFixed(2)}\nGanaste: ${result.pointsEarned} puntos⭐\n${result.pointsRedeemed > 0 ? `Canjeaste: ${result.pointsRedeemed} puntos` : ''}`);
+            alert(`¡Compra realizada con éxito!\n\nHas pagado: ${formatPrice(result.totalPaid)}\nGanaste: ${result.pointsEarned} puntos⭐\n${result.pointsRedeemed > 0 ? `Canjeaste: ${result.pointsRedeemed} puntos` : ''}`);
         } else {
-            alert(`¡Compra realizada con éxito!\n\nHas pagado: $${result.totalPaid.toFixed(2)}`);
+            alert(`¡Compra realizada con éxito!\n\nHas pagado: ${formatPrice(result.totalPaid)}`);
         }
         setUsePoints(0);
     };
@@ -59,7 +62,7 @@ const CartModal = () => {
                                         <img src={item.image} alt={item.name} />
                                         <div className="item-details">
                                             <h4>{item.name}</h4>
-                                            <p>{item.size && item.size !== 'Única' ? `Talla: ${item.size}` : item.type}</p>
+                                            <p>{item.size ? `Talla: ${item.size}` : item.type}</p>
                                             <div className="item-actions">
                                                 <button onClick={() => updateQuantity(item.id, item.quantity - 1)}>-</button>
                                                 <span>{item.quantity}</span>
@@ -67,7 +70,7 @@ const CartModal = () => {
                                             </div>
                                         </div>
                                         <div className="item-price">
-                                            <p>${((item.discountPrice || item.price) * item.quantity).toFixed(2)}</p>
+                                            <p>{formatPrice((item.discountPrice || item.price) * item.quantity)}</p>
                                             <button className="remove-btn" onClick={() => removeFromCart(item.id)}>Eliminar</button>
                                         </div>
                                     </div>
@@ -77,7 +80,7 @@ const CartModal = () => {
                             <div className="cart-summary">
                                 <div className="summary-row">
                                     <span>Subtotal:</span>
-                                    <span>${total.toFixed(2)}</span>
+                                    <span>{formatPrice(total)}</span>
                                 </div>
                                 
                                 {isAuthenticated && pointsBalance > 0 && (
@@ -88,7 +91,7 @@ const CartModal = () => {
                                                 checked={usePoints > 0} 
                                                 onChange={handleTogglePoints} 
                                             />
-                                            Canjear {maxPointsToUse} pts por un descuento de ${(maxPointsToUse / 10).toFixed(2)}
+                                            Canjear {maxPointsToUse} pts por un descuento de {formatPrice(maxPointsToUse / 10)}
                                         </label>
                                         <small>Tienes {pointsBalance} puntos disponibles.</small>
                                     </div>
@@ -105,13 +108,13 @@ const CartModal = () => {
                                 {usePoints > 0 && (
                                     <div className="summary-row discount">
                                         <span>Descuento (Puntos):</span>
-                                        <span>-${(usePoints / 10).toFixed(2)}</span>
+                                        <span>-{formatPrice(usePoints / 10)}</span>
                                     </div>
                                 )}
 
                                 <div className="summary-row total">
                                     <span>Total Final:</span>
-                                    <span>${Math.max(0, total - (usePoints / 10)).toFixed(2)}</span>
+                                    <span>{formatPrice(Math.max(0, total - (usePoints / 10)))}</span>
                                 </div>
                                 
                                 {isAuthenticated && (
