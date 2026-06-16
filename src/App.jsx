@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import BottomNav from './components/layout/BottomNav';
@@ -47,6 +47,9 @@ const PageLoader = () => (
 );
 
 function App() {
+  const location = useLocation();
+  const isHugsRoute = location.pathname === '/hugs';
+
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <div className="app-container">
@@ -72,7 +75,7 @@ function App() {
             </Routes>
           </Suspense>
         </main>
-        <Footer className="desktop-footer" />
+        {!isHugsRoute && <Footer className="desktop-footer" />}
         <BottomNav />
         <CartModal />
       </div>

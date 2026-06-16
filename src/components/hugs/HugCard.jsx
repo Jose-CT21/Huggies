@@ -162,7 +162,7 @@ const HugCard = ({ video, isActive }) => {
         const textLength = video.description ? video.description.length : 0;
 
         // Base values
-        let dynamicTop = 0;
+        let dynamicTop = 70;
         let dynamicScale = 1.06;
 
         if (textLength < 40) {

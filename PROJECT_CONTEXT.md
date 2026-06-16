@@ -134,6 +134,9 @@ huggies-web/
 2. **Productos sin Talla**:
    - Categorías como *Toallitas húmedas* y *Cuidado de la piel* tienen `size: null`.
    - El filtro de tallas debe ocultarse dinámicamente si se seleccionan estas categorías.
+3. **Sección "Hugs" (Zona Restringida)**:
+   - El apartado de Hugs (comunidad de estilo feed vertical) no debe tener Footer.
+   - **REGLA ESTRICTA**: NO se debe añadir ningún elemento, componente, o lógica adicional a este apartado a menos que el usuario lo confirme y solicite personal y explícitamente.
 
 ---
 
