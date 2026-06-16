@@ -4,9 +4,19 @@ import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import BottomNav from './components/layout/BottomNav';
 import CartModal from './components/ui/CartModal';
-import ScrollToTopButton from './components/ui/ScrollToTopButton';
 import OnboardingWizard from './components/ui/OnboardingWizard';
-import AIAssistant from './components/ui/AIAssistant';
+import AppTutorial from './components/ui/AppTutorial';
+import { ErrorBoundary } from 'react-error-boundary';
+
+function ErrorFallback({ error }) {
+  return (
+    <div role="alert" style={{ padding: '20px', color: 'red' }}>
+      <h2>Ocurrió un error en la aplicación:</h2>
+      <pre style={{ whiteSpace: 'pre-wrap', background: '#ffebee', padding: '10px' }}>{error.message}</pre>
+      <pre style={{ whiteSpace: 'pre-wrap', background: '#f5f5f5', padding: '10px', fontSize: '12px' }}>{error.stack}</pre>
+    </div>
+  );
+}
 
 // Lazy loaded pages for performance optimization
 const Home = lazy(() => import('./pages/Home'));
@@ -21,6 +31,7 @@ const Checkout = lazy(() => import('./pages/Checkout'));
 const OrderSuccess = lazy(() => import('./pages/OrderSuccess'));
 const ArticleDetail = lazy(() => import('./pages/ArticleDetail'));
 const StoreLocator = lazy(() => import('./pages/StoreLocator'));
+const Hugs = lazy(() => import('./pages/Hugs'));
 
 // Simple loading fallback
 const PageLoader = () => (
@@ -37,33 +48,35 @@ const PageLoader = () => (
 
 function App() {
   return (
-    <div className="app-container">
-      <Navbar />
-      <OnboardingWizard />
-      <main className="main-content">
-        <Suspense fallback={<PageLoader />}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/product/:id" element={<ProductDetail />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/comunidad" element={<Community />} />
-            <Route path="/articulo/:id" element={<ArticleDetail />} />
-            <Route path="/cuenta" element={<Account />} />
-            <Route path="/recompensas" element={<Rewards />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/success" element={<OrderSuccess />} />
-            <Route path="/donde-comprar" element={<StoreLocator />} />
-          </Routes>
-        </Suspense>
-      </main>
-      <Footer className="desktop-footer" />
-      <BottomNav />
-      <CartModal />
-      <ScrollToTopButton />
-      <AIAssistant />
-    </div>
+    <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <div className="app-container">
+        <Navbar />
+        <OnboardingWizard />
+        <AppTutorial />
+        <main className="main-content">
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/products" element={<Products />} />
+              <Route path="/product/:id" element={<ProductDetail />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/comunidad" element={<Community />} />
+              <Route path="/articulo/:id" element={<ArticleDetail />} />
+              <Route path="/cuenta" element={<Account />} />
+              <Route path="/recompensas" element={<Rewards />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/success" element={<OrderSuccess />} />
+              <Route path="/donde-comprar" element={<StoreLocator />} />
+              <Route path="/hugs" element={<Hugs />} />
+            </Routes>
+          </Suspense>
+        </main>
+        <Footer className="desktop-footer" />
+        <BottomNav />
+        <CartModal />
+      </div>
+    </ErrorBoundary>
   );
 }
 

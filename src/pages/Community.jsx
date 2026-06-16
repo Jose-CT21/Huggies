@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { initialPosts, postCategories } from '../data/communityData';
+import { Heart, Baby, MessageCircle, Home, Lightbulb, HelpCircle, Star, HeartHandshake } from 'lucide-react';
 import './Community.css';
 
 /* ─────────────────────────────────────────────
@@ -42,7 +43,9 @@ const CreatePostBox = ({ onPost }) => {
             {!expanded && (
                 <div className="cp-trigger" onClick={() => setExpanded(true)}>
                     <img className="cp-avatar" src="https://i.pravatar.cc/150?u=me" alt="Tú" />
-                    <div className="cp-fake-input">¿Qué está pasando con tu bebé? 👶</div>
+                    <div className="cp-fake-input" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        ¿Qué está pasando con tu bebé? <Baby size={20} color="#10b981" />
+                    </div>
                 </div>
             )}
 
@@ -138,7 +141,7 @@ const CreatePostBox = ({ onPost }) => {
 /* ─────────────────────────────────────────────
    COMMENTS SECTION
 ───────────────────────────────────────────── */
-const CommentsSection = ({ postId }) => {
+const CommentsSection = () => {
     const [comments, setComments] = useState([]);
     const [text, setText] = useState('');
 
@@ -270,12 +273,13 @@ const PostCard = ({ post }) => {
 
             {/* Stats row */}
             <div className="post-stats">
-                {likes > 0 && <span>❤️ {likes} {likes === 1 ? 'persona' : 'personas'}</span>}
+                {likes > 0 && <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Heart size={14} color="#ef4444" fill="#ef4444" /> {likes} {likes === 1 ? 'persona' : 'personas'}</span>}
                 <span
                     className="post-stats-replies"
+                    style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
                     onClick={() => setShowComments(s => !s)}
                 >
-                    💬 {post.replies} comentarios
+                    <MessageCircle size={14} color="#6b7280" /> {post.replies} comentarios
                 </span>
             </div>
 
@@ -310,7 +314,7 @@ const PostCard = ({ post }) => {
             </div>
 
             {/* Comments */}
-            {showComments && <CommentsSection postId={post.id} />}
+            {showComments && <CommentsSection />}
         </div>
     );
 };
@@ -401,7 +405,9 @@ const Community = () => {
             {/* Hero */}
             <div className="community-hero">
                 <h1>Comunidad Huggies</h1>
-                <p>El lugar para compartir, aprender y conectar con otros papás 💛</p>
+                <p style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                    El lugar para compartir, aprender y conectar con otros papás <HeartHandshake size={20} color="#f59e0b" />
+                </p>
             </div>
 
             <div className="community-root container">
@@ -421,7 +427,7 @@ const Community = () => {
                                 className={`filter-pill ${activeFilter === 'Todos' ? 'active' : ''}`}
                                 onClick={() => setActiveFilter('Todos')}
                             >
-                                🏠 Todos los temas
+                                <Home size={16} style={{marginRight: '6px'}} /> Todos los temas
                             </button>
                             {postCategories.map(cat => (
                                 <button
@@ -429,7 +435,7 @@ const Community = () => {
                                     className={`filter-pill ${activeFilter === cat ? 'active' : ''}`}
                                     onClick={() => setActiveFilter(cat)}
                                 >
-                                    {cat === 'Tips de Padres' ? '💡' : cat === 'Dudas' ? '❓' : '⭐'} {cat}
+                                    {cat === 'Tips de Padres' ? <Lightbulb size={16} style={{marginRight: '6px'}} /> : cat === 'Dudas' ? <HelpCircle size={16} style={{marginRight: '6px'}} /> : <Star size={16} style={{marginRight: '6px'}} />} {cat}
                                 </button>
                             ))}
                         </div>
@@ -438,10 +444,9 @@ const Community = () => {
                             value={activeFilter}
                             onChange={(e) => setActiveFilter(e.target.value)}
                         >
-                            <option value="Todos">🏠 Todos los temas</option>
+                            <option value="Todos">Todos los temas</option>
                             {postCategories.map(cat => (
                                 <option key={cat} value={cat}>
-                                    {cat === 'Tips de Padres' ? '💡 ' : cat === 'Dudas' ? '❓ ' : '⭐ '}
                                     {cat}
                                 </option>
                             ))}
@@ -460,7 +465,7 @@ const Community = () => {
                             filtered.map(post => <PostCard key={post.id} post={post} />)
                         ) : (
                             <div className="no-posts">
-                                <div className="no-posts-icon">🌟</div>
+                                <div className="no-posts-icon"><Star size={48} color="#eab308" /></div>
                                 <p>No hay publicaciones en esta categoría aún.</p>
                                 <p>¡Sé el primero en compartir algo!</p>
                             </div>

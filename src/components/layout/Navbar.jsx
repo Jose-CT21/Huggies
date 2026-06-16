@@ -52,8 +52,7 @@ const Navbar = () => {
                 <div className={`navbar__menu-container ${mobileMenuOpen ? 'active' : ''}`}>
                     <div className="navbar__links">
                         <Link to="/products" onClick={closeMobileMenu}>Productos</Link>
-                        <a href="/#beneficios" onClick={closeMobileMenu}>Beneficios</a>
-                        <Link to="/recompensas" onClick={closeMobileMenu}>Recompensas</Link>
+                        <Link to="/hugs" onClick={closeMobileMenu}>Hugs</Link>
                         <Link to="/comunidad" onClick={closeMobileMenu}>Comunidad</Link>
                         <Link to="/donde-comprar" onClick={closeMobileMenu}>Dónde Comprar</Link>
                     </div>

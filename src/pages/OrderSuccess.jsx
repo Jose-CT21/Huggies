@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../components/ui/Button';
 import './OrderSuccess.css';
@@ -12,7 +12,7 @@ const OrderSuccess = () => {
         }
     }, []);
 
-    const orderNumber = `HUG-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+    const [orderNumber] = useState(() => `HUG-${Math.random().toString(36).substring(2, 8).toUpperCase()}`);
 
     return (
         <div className="order-success-page">

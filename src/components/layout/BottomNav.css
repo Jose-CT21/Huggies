@@ -104,34 +104,12 @@
     font-weight: 700;
 }
 
-/* Cart badge */
-.bottom-nav__cart-icon-wrap {
-    position: relative;
+/* Hugs button special styling */
+.bottom-nav__hugs-btn .bottom-nav__icon svg {
+    fill: currentColor;
+    stroke: none;
 }
 
-.bottom-nav__cart-badge {
-    position: absolute;
-    top: -6px;
-    right: -8px;
-    background: var(--color-primary);
-    color: white;
-    font-size: 0.6rem;
-    font-weight: 700;
-    min-width: 16px;
-    height: 16px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 3px;
-    box-shadow: 0 2px 4px rgba(211, 47, 47, 0.4);
-}
-
-/* Cart button special styling */
-.bottom-nav__cart-btn {
-    color: var(--color-text-muted);
-}
-
-.bottom-nav__cart-btn:hover {
-    color: var(--color-primary);
+.bottom-nav__hugs-btn.active .bottom-nav__icon svg {
+    fill: var(--color-primary);
 }

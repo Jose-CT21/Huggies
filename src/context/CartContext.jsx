@@ -3,23 +3,23 @@ import { useAuth } from './AuthContext';
 
 const CartContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
     const { isAuthenticated } = useAuth();
-    const [cartItems, setCartItems] = useState([]);
-    const [pointsBalance, setPointsBalance] = useState(150); // Provide some initial points for demo purposes
+    const [cartItems, setCartItems] = useState(() => {
+        const savedCart = localStorage.getItem('huggies_cart');
+        return savedCart ? JSON.parse(savedCart) : [];
+    });
+    const [pointsBalance, setPointsBalance] = useState(() => {
+        const savedPoints = localStorage.getItem('huggies_points');
+        return savedPoints ? parseInt(savedPoints, 10) : 150;
+    });
     
     const [isCartOpen, setIsCartOpen] = useState(false);
 
     // Simple persistence (in a real app this would be in a DB)
-    useEffect(() => {
-        const savedCart = localStorage.getItem('huggies_cart');
-        const savedPoints = localStorage.getItem('huggies_points');
-        if (savedCart) setCartItems(JSON.parse(savedCart));
-        if (savedPoints) setPointsBalance(parseInt(savedPoints, 10));
-    }, []);
-
     useEffect(() => {
         localStorage.setItem('huggies_cart', JSON.stringify(cartItems));
         localStorage.setItem('huggies_points', pointsBalance.toString());

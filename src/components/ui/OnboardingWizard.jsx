@@ -1,33 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import Button from './Button';
 import './OnboardingWizard.css';
+import CustomDatePicker from './CustomDatePicker';
+import { Sparkles, Baby, Smile, Heart, Calendar, Shield, Puzzle } from 'lucide-react';
 
-const DIAPER_SIZES = [
-    { size: 'RN', label: 'Recién Nacido', weight: 'Hasta 4 kg' },
-    { size: 'P', label: 'Pequeño', weight: '3 - 6 kg' },
-    { size: 'M', label: 'Mediano', weight: '5 - 9 kg' },
-    { size: 'G', label: 'Grande', weight: '9 - 13 kg' },
-    { size: 'XG', label: 'Extra Grande', weight: '12 - 15 kg' },
-    { size: 'XXG', label: 'Jumbo', weight: 'Más de 14 kg' }
-];
-
-const INTERESTS = [
-    { id: 'sleep', icon: '💤', label: 'Sueño y Descanso', desc: 'Rutinas de sueño, siestas y comodidad nocturna.' },
-    { id: 'nutrition', icon: '🍏', label: 'Nutrición y Lactancia', desc: 'Lactancia, biberón y transición a sólidos.' },
-    { id: 'milestones', icon: '🧩', label: 'Hitos del Desarrollo', desc: 'Gatear, sentarse, primeros pasos y juego estimulante.' },
-    { id: 'skin', icon: '🛡️', label: 'Cuidado de la Piel', desc: 'Prevención de rozaduras, baño y piel sensible.' }
-];
-
-const SKIN_TYPES = [
-    { id: 'normal', label: 'Normal', desc: 'Piel sana sin reacciones frecuentes.' },
-    { id: 'sensitive', label: 'Sensible', desc: 'Tiende a enrojecerse con facilidad.' },
-    { id: 'atopic', label: 'Muy Sensible / Atópica', desc: 'Requiere cuidados especiales e hipoalergénicos.' }
-];
+import { DIAPER_SIZES, INTERESTS, SKIN_TYPES } from '../../data/onboardingData';
 
 const OnboardingWizard = () => {
     const { childData, updateChildData } = useAuth();
-    const [showWizard, setShowWizard] = useState(false);
+    const [prevChildData, setPrevChildData] = useState(childData);
+    const [showWizard, setShowWizard] = useState(() => {
+        const completed = localStorage.getItem('huggies_onboarding_completed');
+        return !completed && !childData;
+    });
     const [step, setStep] = useState(1);
     
     // Form state
@@ -38,13 +24,22 @@ const OnboardingWizard = () => {
     const [skinType, setSkinType] = useState('');
     const [selectedInterests, setSelectedInterests] = useState([]);
 
-    useEffect(() => {
-        // Check if onboarding completed flag is in localStorage
-        const completed = localStorage.getItem('huggies_onboarding_completed');
-        if (!completed && !childData) {
-            setShowWizard(true);
+    // Constants for birth date ranges (dynamic based on Today)
+    const today = new Date();
+
+    // Adjust state during render when childData changes (e.g. on reset/restart onboarding)
+    if (childData !== prevChildData) {
+        setPrevChildData(childData);
+        if (!childData) {
+            const completed = localStorage.getItem('huggies_onboarding_completed');
+            if (!completed) {
+                setShowWizard(true);
+                setStep(1); // Reset wizard step too
+            }
+        } else {
+            setShowWizard(false);
         }
-    }, [childData]);
+    }
 
     const handleInterestToggle = (interestId) => {
         if (selectedInterests.includes(interestId)) {
@@ -141,7 +136,9 @@ const OnboardingWizard = () => {
                     {/* STEP 1: Name and Gender */}
                     {step === 1 && (
                         <div className="wizard-step animate-fade-in">
-                            <h2 className="wizard-title">¡Te damos la bienvenida a Huggies! 👶✨</h2>
+                            <h2 className="wizard-title" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                                ¡Te damos la bienvenida a Huggies! <Baby size={28} color="#0ea5e9" />
+                            </h2>
                             <p className="wizard-subtitle">Para darte una experiencia personalizada con artículos y recomendaciones, cuéntanos sobre tu bebé.</p>
                             
                             <div className="form-group-wizard">
@@ -162,21 +159,21 @@ const OnboardingWizard = () => {
                                         className={`gender-card ${gender === 'boy' ? 'active' : ''}`}
                                         onClick={() => setGender('boy')}
                                     >
-                                        <span className="gender-icon">👦</span>
+                                        <span className="gender-icon"><Smile size={32} color="#0EA5E9" /></span>
                                         <span className="gender-name">Niño</span>
                                     </div>
                                     <div 
                                         className={`gender-card ${gender === 'girl' ? 'active' : ''}`}
                                         onClick={() => setGender('girl')}
                                     >
-                                        <span className="gender-icon">👧</span>
+                                        <span className="gender-icon"><Smile size={32} color="#EC4899" /></span>
                                         <span className="gender-name">Niña</span>
                                     </div>
                                     <div 
                                         className={`gender-card ${gender === 'other' ? 'active' : ''}`}
                                         onClick={() => setGender('other')}
                                     >
-                                        <span className="gender-icon">✨</span>
+                                        <span className="gender-icon"><Sparkles size={32} color="#8b5cf6" /></span>
                                         <span className="gender-name">Prefiero no decirlo</span>
                                     </div>
                                 </div>
@@ -187,42 +184,37 @@ const OnboardingWizard = () => {
                     {/* STEP 2: BirthDate */}
                     {step === 2 && (
                         <div className="wizard-step animate-fade-in">
-                            <h2 className="wizard-title">¿Cuál es su fecha de nacimiento? 📅</h2>
+                            <h2 className="wizard-title" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                                ¿Cuál es su fecha de nacimiento? <Calendar size={28} color="#f59e0b" />
+                            </h2>
                             <p className="wizard-subtitle">
                                 Si está en camino, puedes seleccionar la fecha estimada de parto. Calcularemos su edad automáticamente para adaptar los consejos.
                             </p>
 
-                            <div className="form-group-wizard date-step-wrapper">
-                                <label className="wizard-label">Fecha de nacimiento / Estimada de parto</label>
-                                <input 
-                                    type="date" 
-                                    className="wizard-input date-picker-wizard"
-                                    value={birthDate}
-                                    onChange={(e) => setBirthDate(e.target.value)}
-                                    max={new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0]} // up to 1 year in future
-                                />
+                            <CustomDatePicker birthDate={birthDate} setBirthDate={setBirthDate} />
                                 
                                 {birthDate && (
                                     <div className="age-preview-badge animate-slide-up">
                                         {babyMonths !== null && (
                                             babyMonths < 0 ? (
-                                                <span>🤰 ¡Tu bebé está en camino! (Faltan {Math.abs(babyMonths)} meses)</span>
+                                                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Heart size={16} color="#EC4899" fill="#EC4899" /> ¡Tu bebé está en camino! (Faltan {Math.abs(babyMonths)} meses)</span>
                                             ) : babyMonths === 0 ? (
-                                                <span>👶 ¡Recién nacido! (Menos de 1 mes)</span>
+                                                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Baby size={16} color="#10B981" /> ¡Recién nacido! (Menos de 1 mes)</span>
                                             ) : (
-                                                <span>👶 Edad actual calculada: <strong>{babyMonths} {babyMonths === 1 ? 'mes' : 'meses'}</strong></span>
+                                                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Baby size={16} color="#10B981" /> Edad actual calculada: <strong>{babyMonths} {babyMonths === 1 ? 'mes' : 'meses'}</strong></span>
                                             )
                                         )}
                                     </div>
                                 )}
-                            </div>
                         </div>
                     )}
 
                     {/* STEP 3: Diaper Size and Skin Type */}
                     {step === 3 && (
                         <div className="wizard-step animate-fade-in">
-                            <h2 className="wizard-title">Talla de Pañal y Tipo de Piel 🛡️</h2>
+                            <h2 className="wizard-title" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                                Talla de Pañal y Tipo de Piel <Shield size={28} color="#8b5cf6" />
+                            </h2>
                             <p className="wizard-subtitle">Esto nos ayuda a recomendarte la línea Huggies ideal y a evitar irritaciones.</p>
 
                             <div className="form-group-wizard">
@@ -262,7 +254,9 @@ const OnboardingWizard = () => {
                     {/* STEP 4: Interests */}
                     {step === 4 && (
                         <div className="wizard-step animate-fade-in">
-                            <h2 className="wizard-title">¿Qué temas te gustaría seguir de cerca? 🧩</h2>
+                            <h2 className="wizard-title" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                                ¿Qué temas te gustaría seguir de cerca? <Puzzle size={28} color="#eab308" />
+                            </h2>
                             <p className="wizard-subtitle">Selecciona los temas de interés para personalizar el contenido informativo y consejos.</p>
 
                             <div className="interests-grid">

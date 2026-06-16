@@ -70,7 +70,9 @@ huggies-web/
     │       ├── Card.jsx / .css            # Tarjetas contenedor con efecto hover
     │       ├── CartModal.jsx / .css       # Drawer lateral del carrito de compras
     │       ├── OnboardingWizard.jsx / .css # Modal interactivo de 5 pasos para registrar al bebé
-    │       └── ScrollToTopButton.jsx / .css # Botón flotante para subir
+    │       ├── ScrollToTopButton.jsx / .css # Botón flotante para subir
+    │       ├── AIAssistant.jsx / .css     # Asistente virtual de IA con recomendaciones y chat
+    │       └── icons/                     # Iconos SVG reutilizables (CartIcon, StarIcon)
     │
     └── pages/                    # 📄 Vistas Principales (Cargadas mediante lazy loading)
         ├── Home.jsx              # Landing Page compuesta
@@ -79,10 +81,12 @@ huggies-web/
         ├── Community.jsx / .css  # Red social (posts, likes, comentarios, crear posts)
         ├── Login.jsx / .css      # Registro e inicio de sesión
         ├── ForgotPassword.jsx / .css # Recuperación de contraseña
-        ├── Account.jsx / .css    # Perfil del usuario e información editable del bebé
+        ├── Account.jsx / .css    # Perfil del usuario e información de la cuenta
         ├── Rewards.jsx / .css    # Dashboard de Huggies Rewards (canje de puntos)
         ├── Checkout.jsx / .css   # Pasarela de pago simulada
-        └── OrderSuccess.jsx / .css # Confirmación de compra exitosa
+        ├── OrderSuccess.jsx / .css # Confirmación de compra exitosa
+        ├── ArticleDetail.jsx / .css # Ficha de detalle para artículos del blog
+        └── StoreLocator.jsx / .css # Localizador de tiendas físicas y puntos de venta
 ```
 
 ---
@@ -131,3 +135,27 @@ huggies-web/
 5. **SEO y Semántica HTML**:
    - Utilizar etiquetas semánticas de HTML5 (`<header>`, `<section>`, `<main>`, `<article>`, `<footer>`).
    - Mantener títulos descriptivos por página y asegurar que los elementos interactivos tengan identificadores lógicos o roles accesibles.
+
+---
+
+## 🚀 Últimos Cambios y Avances Recientes
+
+1. **Onboarding Flow (`OnboardingWizard`)**:
+   - Se añadió un modal interactivo de 5 pasos para recolectar información sobre el bebé (nombre, fecha de nacimiento o fecha estimada de parto, peso, etc.).
+   - La información se almacena en el `AuthContext` bajo `childData` y es editable desde la página de perfil (`Account.jsx`).
+2. **Recomendaciones Personalizadas (`PersonalizedRecommendations`)**:
+   - Muestra productos recomendados dinámicamente según la edad en meses del bebé calculada a partir de los datos ingresados en el onboarding o el perfil.
+3. **Asistente de IA (`AIAssistant`)**:
+   - Chat virtual interactivo flotante para guiar a los padres, responder dudas frecuentes de crianza y recomendar el pañal ideal.
+4. **Flujo de Compra y Checkout**:
+   - Se implementaron las páginas de Detalle de Producto (`ProductDetail`), Checkout simulado (`Checkout`) con validación de campos, y Confirmación de Compra (`OrderSuccess`).
+5. **Localizador de Tiendas (`StoreLocator`) y Detalle de Blog (`ArticleDetail`)**:
+   - Se crearon vistas dedicadas para buscar tiendas físicas que venden productos Huggies y ver detalles completos de los artículos del blog.
+6. **Optimización y Limpieza de Código (React 19)**:
+   - Se eliminaron y resolvieron más de 15 advertencias/errores de ESLint a lo largo de toda la base de código.
+   - Se eliminaron hooks `useEffect` redundantes reemplazándolos por inicialización perezosa de estados (`useState(() => ...)`) y ajustes de estado en tiempo de renderizado.
+   - Se preservó la idempotencia y pureza de los componentes en React 19 extrayendo llamadas impuras (como `Date.now()` o `Math.random()`) fuera de las funciones de render.
+7. **Refactorización Arquitectónica y Estabilidad (Avances Recientes)**:
+   - **Modularización:** Extracción de lógica compleja de componentes de interfaz (ej. lógica de filtros a `useProductFilters.js`, chat de IA a `aiChatService.js`, datos estáticos de onboarding a `onboardingData.js`).
+   - **Manejo de Errores:** Implementación de un `ErrorBoundary` global (`react-error-boundary`) en `App.jsx` para evitar pantallas blancas (white screens of death) al navegar, mostrando un fallback controlado.
+   - **Refinamiento de UI Responsiva:** Corrección de la superposición del `BottomNav` móvil sobre el modal del carrito, y separación visual de los tags de producto (Recomendado y Oferta) para mejorar la usabilidad.

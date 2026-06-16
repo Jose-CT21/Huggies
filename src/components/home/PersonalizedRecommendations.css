@@ -61,23 +61,34 @@
 .rec-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--spacing-lg);
+    gap: var(--spacing-md);
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 640px) {
+    .rec-grid {
+        gap: var(--spacing-lg);
+    }
+}
+
+@media (min-width: 768px) {
+    .rec-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (min-width: 1100px) {
     .rec-grid {
         grid-template-columns: 1.2fr 1fr 0.9fr;
     }
 }
 
-/* Inside Cards */
+/* Inside Cards - remove duplicate box; ui-card already provides the border+background */
 .card-custom-inner {
     padding: var(--spacing-lg);
-    background-color: var(--color-bg-white);
-    border-radius: var(--border-radius-lg);
     height: 100%;
     display: flex;
     flex-direction: column;
+    box-sizing: border-box;
 }
 
 /* Stage Info */
@@ -288,6 +299,8 @@
     border-radius: var(--border-radius-md);
     background-color: var(--color-bg-light);
     transition: all 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .rec-product-row:hover {
@@ -323,15 +336,14 @@
     font-size: 0.85rem;
     font-weight: 700;
     color: var(--color-text-main);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    word-wrap: break-word;
 }
 
 .p-row-meta {
     font-size: 0.68rem;
     color: var(--color-text-muted);
     display: flex;
+    flex-wrap: wrap;
     gap: 4px;
     margin-top: 1px;
 }
@@ -369,9 +381,12 @@
 }
 
 /* Tip & Articles Section */
-.bg-gradient-tip {
-    background: linear-gradient(135deg, #FFF9C4 0%, #FFF59D 100%);
-    border: 1px solid #FFF59D;
+.bg-gradient-tip,
+.ui-card.bg-gradient-tip {
+    background: linear-gradient(135deg, #FFF9C4 0%, #FFF59D 100%) !important;
+    border: 1px solid #FDE68A !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
 }
 
 .tip-header {
@@ -477,9 +492,11 @@
     padding: var(--spacing-md) var(--spacing-lg);
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-lg);
+    gap: var(--spacing-md);
     align-items: center;
     text-align: center;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 @media (min-width: 640px) {
@@ -488,6 +505,7 @@
         text-align: left;
         align-items: center;
         padding: var(--spacing-2xl);
+        gap: var(--spacing-lg);
     }
 }
 

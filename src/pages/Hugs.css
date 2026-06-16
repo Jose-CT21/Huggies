@@ -1,0 +1,444 @@
+/* ===== HUGS PAGE — Short Video Feed ===== */
+
+.hugs-page {
+    background: #000;
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    padding-top: 70px; /* Navbar offset */
+    box-sizing: border-box;
+}
+
+/* Header */
+.hugs-page__header {
+    text-align: center;
+    padding: 16px 20px 12px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 100%);
+    position: relative;
+    z-index: 10;
+}
+
+.hugs-page__title {
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.hugs-page__subtitle {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.8rem;
+    margin: 4px 0 0;
+}
+
+/* Feed container — strict custom scroll */
+.hugs-feed {
+    flex: 1;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.hugs-feed__inner {
+    height: 100%;
+    width: 100%;
+}
+
+/* Each slide takes full viewport height */
+.hugs-feed__slide {
+    height: 100%;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+@media (max-width: 900px) {
+    .hugs-page {
+        padding-top: 55px; /* Navbar height on mobile */
+    }
+
+    .hugs-feed__slide {
+        height: 100%; /* Inner uses 100% of the feed container */
+    }
+
+    .hugs-page__header {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        padding-top: 12px;
+        padding-bottom: 8px;
+    }
+}
+
+/* ===== HUG CARD ===== */
+
+.hug-card {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.hug-card__video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+/* Gradient overlays */
+.hug-card__gradient-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 120px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 2;
+}
+
+.hug-card__gradient-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 260px;
+    background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* Play/Pause indicator */
+.hug-card__play-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    animation: playIndicatorPop 0.8s ease-out forwards;
+    pointer-events: none;
+}
+
+.play-indicator-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 72px;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(8px);
+    border-radius: 50%;
+    font-size: 28px;
+    color: white;
+}
+
+@keyframes playIndicatorPop {
+    0% { opacity: 1; transform: translate(-50%, -50%) scale(0.8); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(1.2); }
+}
+
+/* Double-tap heart burst */
+.hug-card__heart-burst {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    animation: heartBurst 0.9s ease-out forwards;
+    pointer-events: none;
+}
+
+.hug-card__heart-burst span {
+    font-size: 80px;
+    display: block;
+}
+
+@keyframes heartBurst {
+    0% { opacity: 1; transform: translate(-50%, -50%) scale(0); }
+    30% { opacity: 1; transform: translate(-50%, -50%) scale(1.3); }
+    60% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(1.4) translateY(-30px); }
+}
+
+/* Share toast */
+.hug-card__share-toast {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.75);
+    color: white;
+    padding: 10px 24px;
+    border-radius: 24px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    backdrop-filter: blur(8px);
+    animation: toastFade 2s ease-out forwards;
+    pointer-events: none;
+}
+
+@keyframes toastFade {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+    15% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* ===== RIGHT SIDE ACTION BUTTONS ===== */
+
+.hug-card__actions {
+    position: absolute;
+    right: 12px;
+    bottom: 140px;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+}
+
+.hug-action__creator-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-primary), #ff6b6b);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    border: 2px solid white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    margin-bottom: 4px;
+}
+
+.hug-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    transition: transform 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.hug-action-btn:active {
+    transform: scale(0.85);
+}
+
+.hug-action-icon {
+    font-size: 28px;
+    display: block;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4));
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.hug-action-btn--liked .hug-action-icon {
+    animation: likePopIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes likePopIn {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.4); }
+    100% { transform: scale(1); }
+}
+
+.hug-action-count {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: white;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+/* ===== BOTTOM INFO OVERLAY ===== */
+
+.hug-card__info {
+    position: absolute;
+    bottom: 80px;
+    left: 16px;
+    right: 80px;
+    z-index: 5;
+    color: white;
+}
+
+.hug-card__creator-line {
+    margin-bottom: 6px;
+}
+
+.hug-card__creator-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+
+.hug-verified-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-secondary);
+    color: white;
+    font-size: 0.55rem;
+    font-weight: 800;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
+.hug-card__description {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    margin: 0 0 8px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.hug-card__hashtags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.hug-hashtag {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.85);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.hug-hashtag:hover {
+    color: var(--color-secondary-light);
+}
+
+/* ===== PROGRESS BAR ===== */
+
+.hug-card__progress-area {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 6;
+    padding: 0 12px 12px;
+}
+
+.hug-progress-slider {
+    width: 100%;
+    height: 4px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+    transition: height 0.15s ease;
+}
+
+.hug-progress-slider:hover {
+    height: 6px;
+}
+
+.hug-progress-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(211, 47, 47, 0.5);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.hug-progress-slider:hover::-webkit-slider-thumb {
+    opacity: 1;
+}
+
+.hug-progress-slider::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 0 6px rgba(211, 47, 47, 0.5);
+}
+
+/* Track fill — uses a gradient trick */
+.hug-progress-slider::-webkit-slider-runnable-track {
+    height: inherit;
+    border-radius: 2px;
+    background: linear-gradient(to right, var(--color-primary) 0%, var(--color-primary) var(--progress, 0%), rgba(255,255,255,0.25) var(--progress, 0%));
+}
+
+.hug-progress-time {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.62rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 4px;
+    padding: 0 2px;
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 900px) {
+    .hug-card__actions {
+        right: 8px;
+        bottom: 120px;
+        gap: 14px;
+    }
+
+    .hug-action-icon {
+        font-size: 24px;
+    }
+
+    .hug-action__creator-avatar {
+        width: 38px;
+        height: 38px;
+        font-size: 1.2rem;
+    }
+
+    .hug-card__info {
+        bottom: 65px;
+        left: 12px;
+        right: 65px;
+    }
+
+    .hug-card__progress-area {
+        padding: 0 8px 8px;
+    }
+}
+
+/* Desktop — center the feed and limit width */
+@media (min-width: 901px) {
+    .hugs-feed {
+        max-width: 420px;
+        margin: 0 auto;
+        border-left: 1px solid #222;
+        border-right: 1px solid #222;
+    }
+}

@@ -1,7 +1,6 @@
 import React from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { useCart } from '../../context/CartContext';
 import './BottomNav.css';
 
 const HomeIcon = () => (
@@ -19,9 +18,9 @@ const BoxIcon = () => (
     </svg>
 );
 
-const StarIcon = () => (
+const HugsIcon = () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        <polygon points="5 3 19 12 5 21 5 3" />
     </svg>
 );
 
@@ -41,69 +40,39 @@ const UserIcon = () => (
     </svg>
 );
 
-const CartIcon = () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="9" cy="21" r="1" />
-        <circle cx="20" cy="21" r="1" />
-        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-    </svg>
-);
-
 const BottomNav = () => {
     const location = useLocation();
-    const navigate = useNavigate();
     const { isAuthenticated } = useAuth();
-    const { cartItems, toggleCart, isCartOpen, setIsCartOpen } = useCart();
-
-    const cartItemsCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
-
-    const closeCart = () => {
-        if (isCartOpen) setIsCartOpen(false);
-    };
 
     const isActive = (path) => {
-        if (isCartOpen) return false;
         if (path === '/') return location.pathname === '/';
         return location.pathname.startsWith(path);
     };
 
-    const isRewardsActive = !isCartOpen && location.pathname.startsWith('/recompensas');
-
     return (
         <nav className="bottom-nav">
-            <Link to="/" onClick={closeCart} className={`bottom-nav__item ${isActive('/') && !isRewardsActive ? 'active' : ''}`}>
+            <Link to="/" className={`bottom-nav__item ${isActive('/') ? 'active' : ''}`}>
                 <span className="bottom-nav__icon"><HomeIcon /></span>
                 <span className="bottom-nav__label">Inicio</span>
             </Link>
 
-            <Link to="/products" onClick={closeCart} className={`bottom-nav__item ${isActive('/products') ? 'active' : ''}`}>
+            <Link to="/products" className={`bottom-nav__item ${isActive('/products') ? 'active' : ''}`}>
                 <span className="bottom-nav__icon"><BoxIcon /></span>
                 <span className="bottom-nav__label">Productos</span>
             </Link>
 
-            <button className={`bottom-nav__item bottom-nav__cart-btn ${isCartOpen ? 'active' : ''}`} onClick={toggleCart}>
-                <span className="bottom-nav__icon bottom-nav__cart-icon-wrap">
-                    <CartIcon />
-                    {cartItemsCount > 0 && (
-                        <span className="bottom-nav__cart-badge">{cartItemsCount}</span>
-                    )}
-                </span>
-                <span className="bottom-nav__label">Carrito</span>
-            </button>
-
-            <Link to="/recompensas" onClick={closeCart} className={`bottom-nav__item ${isRewardsActive ? 'active' : ''}`}>
-                <span className="bottom-nav__icon"><StarIcon /></span>
-                <span className="bottom-nav__label">Rewards</span>
+            <Link to="/hugs" className={`bottom-nav__item bottom-nav__hugs-btn ${isActive('/hugs') ? 'active' : ''}`}>
+                <span className="bottom-nav__icon"><HugsIcon /></span>
+                <span className="bottom-nav__label">Hugs</span>
             </Link>
 
-            <Link to="/comunidad" onClick={closeCart} className={`bottom-nav__item ${isActive('/comunidad') ? 'active' : ''}`}>
+            <Link to="/comunidad" className={`bottom-nav__item ${isActive('/comunidad') ? 'active' : ''}`}>
                 <span className="bottom-nav__icon"><CommunityIcon /></span>
                 <span className="bottom-nav__label">Comunidad</span>
             </Link>
 
             <Link
                 to={isAuthenticated ? '/cuenta' : '/login'}
-                onClick={closeCart}
                 className={`bottom-nav__item ${isActive('/cuenta') || isActive('/login') ? 'active' : ''}`}
             >
                 <span className="bottom-nav__icon"><UserIcon /></span>

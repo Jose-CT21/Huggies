@@ -1,0 +1,71 @@
+.registration-promo {
+    margin: var(--spacing-md) var(--spacing-md);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+    border-radius: var(--border-radius-xl);
+    padding: var(--spacing-xl);
+    display: flex;
+    position: relative;
+    overflow: hidden;
+    color: white;
+    box-shadow: 0 10px 20px rgba(229, 57, 53, 0.2);
+}
+
+.promo-content {
+    position: relative;
+    z-index: 2;
+}
+
+.promo-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin: 0 0 var(--spacing-sm);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.promo-desc {
+    font-size: 0.95rem;
+    margin: 0 0 var(--spacing-lg);
+    line-height: 1.5;
+    opacity: 0.95;
+}
+
+.promo-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: flex-start;
+}
+
+.promo-actions button:first-child {
+    background-color: white !important;
+    color: var(--color-primary) !important;
+    font-weight: 800;
+}
+
+.promo-login-link {
+    background: none;
+    border: none;
+    color: white;
+    text-decoration: underline;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+}
+
+.promo-badge {
+    position: absolute;
+    right: -20px;
+    bottom: -20px;
+    font-size: 8rem;
+    opacity: 0.2;
+    transform: rotate(-15deg);
+    z-index: 1;
+}
+
+@media (min-width: 768px) {
+    .promo-actions {
+        flex-direction: row;
+        align-items: center;
+    }
+}

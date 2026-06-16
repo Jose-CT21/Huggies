@@ -264,3 +264,89 @@ input:checked + .slider:before {
     line-height: 1.4;
 }
 
+/* ────────────────────────────────
+   Cart Summary (Account Page)
+──────────────────────────────── */
+.account-cart-summary {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.account-cart-stats {
+    display: flex;
+    gap: var(--spacing-md);
+    background: #F8F9FA;
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-md);
+    border: 1px solid #E9ECEF;
+}
+
+.stat-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.stat-box:first-child {
+    border-right: 1px solid #E9ECEF;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    font-weight: 600;
+}
+
+.stat-value {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--color-primary);
+}
+
+/* ────────────────────────────────
+   Rewards Summary (Account Page)
+──────────────────────────────── */
+.account-rewards-summary {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    background: linear-gradient(135deg, #FFF8E1 0%, #FFECB3 100%);
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-md);
+    border: 1px solid #FFD54F;
+}
+
+.rewards-badge-large {
+    width: 48px;
+    height: 48px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 12px rgba(245, 127, 23, 0.2);
+}
+
+.rewards-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.rewards-points {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #F57F17;
+    margin: 0 0 2px;
+}
+
+.rewards-level {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #B28900;
+    margin: 0;
+}

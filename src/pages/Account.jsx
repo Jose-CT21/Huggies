@@ -1,19 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 import Button from '../components/ui/Button';
 import './Account.css';
 
 const Account = () => {
     const { isAuthenticated, user, logout, childData, updateChildData } = useAuth();
+    const { cartItems, getCartTotal, toggleCart, pointsBalance } = useCart();
     const navigate = useNavigate();
+    
+    const cartItemsCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+    const cartTotal = getCartTotal();
+
+    // Determine rewards level
+    let level = 'Bronce';
+    if (pointsBalance > 500) level = 'Plata';
+    if (pointsBalance > 1000) level = 'Oro';
+    if (pointsBalance > 2000) level = 'Platino';
     
     // Edit state
     const [isEditing, setIsEditing] = useState(false);
-    const [editName, setEditName] = useState('');
-    const [editBirthDate, setEditBirthDate] = useState('');
-    const [editDiaperSize, setEditDiaperSize] = useState('M');
-    const [editSkinType, setEditSkinType] = useState('normal');
+    const [editName, setEditName] = useState(() => childData && !childData.skipped ? (childData.name || '') : '');
+    const [editBirthDate, setEditBirthDate] = useState(() => childData && !childData.skipped ? (childData.birthDate || '') : '');
+    const [editDiaperSize, setEditDiaperSize] = useState(() => childData && !childData.skipped ? (childData.diaperSize || 'M') : 'M');
+    const [editSkinType, setEditSkinType] = useState(() => childData && !childData.skipped ? (childData.skinType || 'normal') : 'normal');
 
     useEffect(() => {
         if (!isAuthenticated) {
@@ -21,15 +32,15 @@ const Account = () => {
         }
     }, [isAuthenticated, navigate]);
 
-    // Populate edit fields when editing is opened or childData updates
-    useEffect(() => {
+    const handleStartEditing = () => {
         if (childData && !childData.skipped) {
             setEditName(childData.name || '');
             setEditBirthDate(childData.birthDate || '');
             setEditDiaperSize(childData.diaperSize || 'M');
             setEditSkinType(childData.skinType || 'normal');
         }
-    }, [childData, isEditing]);
+        setIsEditing(true);
+    };
 
     if (!isAuthenticated) return null;
 
@@ -193,13 +204,52 @@ const Account = () => {
                                                 <span>Sensibilidad de Piel</span>
                                                 <strong>{getSkinTypeLabel(childData.skinType)}</strong>
                                             </div>
-                                            <Button variant="outline" size="small" className="mt-md" onClick={() => setIsEditing(true)}>
+                                            <Button variant="outline" size="small" className="mt-md" onClick={handleStartEditing}>
                                                 Editar Información
                                             </Button>
                                         </>
                                     )}
                                 </>
                             )}
+                        </div>
+                    </section>
+
+                    {/* Mi Carrito Section */}
+                    <section className="account-card delay-150 animate-slide-up">
+                        <h2 className="account-card__title">Mi Carrito</h2>
+                        <div className="account-card__content">
+                            <div className="account-cart-summary">
+                                <div className="account-cart-stats">
+                                    <div className="stat-box">
+                                        <span className="stat-label">Artículos</span>
+                                        <span className="stat-value">{cartItemsCount}</span>
+                                    </div>
+                                    <div className="stat-box">
+                                        <span className="stat-label">Subtotal</span>
+                                        <span className="stat-value">₡{cartTotal.toLocaleString('es-CR')}</span>
+                                    </div>
+                                </div>
+                                <Button variant="primary" size="small" onClick={toggleCart} className="w-full mt-md">
+                                    {cartItemsCount > 0 ? 'Ver Carrito y Pagar' : 'Ver Carrito'}
+                                </Button>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Huggies Rewards Section */}
+                    <section className="account-card delay-150 animate-slide-up">
+                        <h2 className="account-card__title">Huggies Rewards</h2>
+                        <div className="account-card__content">
+                            <div className="account-rewards-summary">
+                                <div className="rewards-badge-large">⭐</div>
+                                <div className="rewards-info">
+                                    <h3 className="rewards-points">{pointsBalance} pts</h3>
+                                    <p className="rewards-level">Nivel {level}</p>
+                                </div>
+                            </div>
+                            <Button variant="outline" size="small" onClick={() => navigate('/recompensas')} className="w-full mt-md">
+                                Ver Recompensas
+                            </Button>
                         </div>
                     </section>
 

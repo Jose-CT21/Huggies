@@ -1,7 +1,7 @@
 .scroll-to-top-btn {
     position: fixed;
-    bottom: 30px;
-    right: 30px;
+    bottom: 95px; /* AI bubble is 60px tall at bottom:20px → top at 80px. 95px leaves a 15px gap */
+    right: 26px;
     width: 50px;
     height: 50px;
     border-radius: 50%;
@@ -13,7 +13,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 999;
+    z-index: 1001;
     opacity: 0;
     visibility: hidden;
     transform: translateY(20px);
@@ -36,7 +36,8 @@
 /* Mobile / Tablet (when BottomNav is visible) */
 @media (max-width: 900px) {
     .scroll-to-top-btn {
-        bottom: 85px; /* Clear the BottomNav */
+        /* Mobile: AI assistant is at bottom:85px (60px tall) → top at 145px. */
+        bottom: 160px;
         right: 15px;
         width: 45px;
         height: 45px;

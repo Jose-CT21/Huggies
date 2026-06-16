@@ -16,9 +16,7 @@ const CartModal = () => {
     const location = useLocation();
 
     useEffect(() => {
-        if (isCartOpen) {
-            setIsCartOpen(false);
-        }
+        setIsCartOpen(false);
     }, [location.pathname, setIsCartOpen]);
 
     if (!isCartOpen) return null;

@@ -1,10 +1,13 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import ProductSidebar from '../components/ProductSidebar';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { huggiesCatalog, productSizes, productTypes, sizelessTypes } from '../data/huggiesCatalog';
+import { productTypes } from '../data/huggiesCatalog';
+import { useProductFilters } from '../hooks/useProductFilters';
+import { Baby, ThumbsUp, ThumbsDown } from 'lucide-react';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import './Products.css';
@@ -22,108 +25,46 @@ const formatPrice = (amount) => {
 
 const Products = () => {
     const navigate = useNavigate();
-    const { childData, updateChildData } = useAuth();
-    const { addToCart } = useCart();
-    
-    const [filters, setFilters] = useState({
-        type: 'Todos',
-        size: 'Todos',
-        search: ''
-    });
+    const { childData, updateChildData, isAuthenticated } = useAuth();
+    const { addToCart, toggleCart, cartItems } = useCart();
 
+    const cartItemsCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+    const {
+        filters,
+        setFilters,
+        activeFilterCount,
+        currentTypeHasSizes,
+        availableSizes,
+        products,
+        recommendedProducts,
+        handleFilterChange
+    } = useProductFilters(childData);
+
+    const [prevChildName, setPrevChildName] = useState(null);
     const [feedbackProducts, setFeedbackProducts] = useState(null);
 
-    // Load feedback on mount or when child changes
-    useEffect(() => {
-        if (childData && childData.name) {
-            const stored = localStorage.getItem(`huggies_feedback_products_${childData.name}`);
-            if (stored) setFeedbackProducts(stored);
-            else setFeedbackProducts(null);
-        }
-    }, [childData]);
+    // Adjust state during render if child name changes to avoid useEffect cascading renders
+    const childName = childData?.name || null;
+    if (childName !== prevChildName) {
+        setPrevChildName(childName);
+        const stored = childName ? localStorage.getItem(`huggies_feedback_products_${childName}`) : null;
+        setFeedbackProducts(stored);
+    }
 
     const handleFeedbackProducts = (val) => {
         if (!childData) return;
         setFeedbackProducts(val);
         localStorage.setItem(`huggies_feedback_products_${childData.name}`, val);
-    };
-
-    // Determine if the current type selection supports sizes
-    const currentTypeHasSizes = filters.type === 'Todos' || !sizelessTypes.includes(filters.type);
-
-    // Calculate available sizes based on selected type
-    const availableSizes = useMemo(() => {
-        if (!currentTypeHasSizes) return [];
-        
-        if (filters.type === 'Todos') return productSizes;
-
-        // Get unique sizes for the selected type
-        const sizesForType = [...new Set(
-            huggiesCatalog
-                .filter(p => p.type === filters.type && p.size !== null)
-                .map(p => p.size)
-        )];
-
-        // Maintain canonical order from productSizes
-        return productSizes.filter(s => sizesForType.includes(s));
-    }, [filters.type, currentTypeHasSizes]);
-
-    // Reset size filter when switching to a sizeless type
-    useEffect(() => {
-        if (!currentTypeHasSizes && filters.size !== 'Todos') {
-            setFilters(prev => ({ ...prev, size: 'Todos' }));
-        }
-    }, [filters.type, currentTypeHasSizes, filters.size]);
-
-    // Filter products based on current filters
-    const products = useMemo(() => {
-        let result = huggiesCatalog;
-
-        if (filters.type !== 'Todos') {
-            result = result.filter(p => p.type === filters.type);
-        }
-
-        if (filters.size !== 'Todos') {
-            // When a size is selected, show products matching that size
-            // PLUS sizeless products (toallitas, cuidado) when viewing "Todos"
-            result = result.filter(p => 
-                p.size === filters.size || (filters.type === 'Todos' && p.size === null)
-            );
-        }
-
-        if (filters.search) {
-            const searchTerm = filters.search.toLowerCase();
-            result = result.filter(p =>
-                p.name.toLowerCase().includes(searchTerm) ||
-                p.description.toLowerCase().includes(searchTerm) ||
-                p.type.toLowerCase().includes(searchTerm)
-            );
-        }
-
-        return result;
-    }, [filters]);
-
-    // Calculate recommended products
-    const recommendedProducts = useMemo(() => {
-        if (!childData || childData.skipped) return [];
-        const { diaperSize, skinType, ageInMonths } = childData;
-        return huggiesCatalog.filter(product => {
-            if (skinType === 'sensitive' || skinType === 'atopic') {
-                return (
-                    (product.size === diaperSize && product.name.includes('Supreme')) ||
-                    (product.type === 'Toallitas' && product.name.includes('Supreme'))
-                );
-            }
-            if (ageInMonths && ageInMonths >= 12 && product.type === 'Pants') {
-                return true;
-            }
-            return product.size === diaperSize || (product.type === 'Toallitas' && product.size === null);
-        }).slice(0, 4);
-    }, [childData]);
-
-    const handleFilterChange = (e) => {
-        const { name, value } = e.target;
-        setFilters(prev => ({ ...prev, [name]: value }));
+        MySwal.fire({
+            title: '¡Gracias por tu opinión!',
+            text: 'Nos ayuda a mejorar las recomendaciones.',
+            icon: 'success',
+            timer: 2000,
+            showConfirmButton: false
+        });
     };
 
     /**
@@ -158,10 +99,10 @@ const Products = () => {
                     <p style="color: #4B5563; font-size: 0.95rem; line-height: 1.5; margin-bottom: 15px;">${product.longDescription || product.description}</p>
                     ${product.features ? `<ul style="margin-top: 10px; padding-left: 20px; color: #4B5563; font-size: 0.9rem;">${product.features.map(f => `<li style="margin-bottom: 4px;">${f}</li>`).join('')}</ul>` : ''}
                     <div style="font-size: 1.4rem; font-weight: 800; color: #1F2937; display: flex; align-items: center; gap: 10px; margin-top: 15px;">
-                        ${product.discountPrice ? 
-                            `<span style="color: #D32F2F;">${formatPrice(product.discountPrice)}</span>
-                             <span style="text-decoration: line-through; color: #9CA3AF; font-size: 1rem; font-weight: 500;">${formatPrice(product.price)}</span>` 
-                            : `<span>${formatPrice(product.price)}</span>`}
+                        ${product.discountPrice ?
+                    `<span style="color: #D32F2F;">${formatPrice(product.discountPrice)}</span>
+                             <span style="text-decoration: line-through; color: #9CA3AF; font-size: 1rem; font-weight: 500;">${formatPrice(product.price)}</span>`
+                    : `<span>${formatPrice(product.price)}</span>`}
                     </div>
                 </div>
             `,
@@ -195,88 +136,41 @@ const Products = () => {
                 <div className="products-header">
                     <h1>Catálogo de Productos Huggies</h1>
                     <p>Encuentra el producto ideal para cada etapa de tu bebé.</p>
+                    {isAuthenticated && (
+                        <button className="products-rewards-chip" onClick={() => navigate('/recompensas')}>
+                            ⭐ Mis Rewards
+                        </button>
+                    )}
                 </div>
 
+                {/* Floating filter toggle button */}
+                <button
+                    className="filter-fab"
+                    id="filter-fab-btn"
+                    onClick={() => setIsFilterOpen(true)}
+                    aria-label="Abrir filtros"
+                >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="4" y1="6" x2="20" y2="6" />
+                        <line x1="8" y1="12" x2="20" y2="12" />
+                        <line x1="12" y1="18" x2="20" y2="18" />
+                    </svg>
+                    Filtros
+                    {activeFilterCount > 0 && (
+                        <span className="filter-fab-badge">{activeFilterCount}</span>
+                    )}
+                </button>
+
                 <div className="products-layout">
-                    {/* Sidebar Filters */}
-                    <aside className="products-sidebar">
-                        <div className="filter-section">
-                            <h3>Búsqueda</h3>
-                            <input
-                                type="text"
-                                name="search"
-                                placeholder="Buscar productos..."
-                                value={filters.search}
-                                onChange={handleFilterChange}
-                                className="search-input"
-                                id="filter-search"
-                            />
-                        </div>
-
-                        <div className="filter-section">
-                            <h3>Tipo de Producto</h3>
-                            <div className="filter-options">
-                                <label className="filter-radio">
-                                    <input
-                                        type="radio"
-                                        name="type"
-                                        value="Todos"
-                                        checked={filters.type === 'Todos'}
-                                        onChange={handleFilterChange}
-                                    />
-                                    <span>Todos</span>
-                                </label>
-                                {productTypes.map(type => (
-                                    <label key={`type-${type}`} className="filter-radio">
-                                        <input
-                                            type="radio"
-                                            name="type"
-                                            value={type}
-                                            checked={filters.type === type}
-                                            onChange={handleFilterChange}
-                                        />
-                                        <span>{type}</span>
-                                    </label>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Size filter — hidden for sizeless product types */}
-                        {currentTypeHasSizes && availableSizes.length > 0 && (
-                            <div className="filter-section filter-section-animated">
-                                <h3>Talla</h3>
-                                <div className="filter-options size-grid">
-                                    <button
-                                        className={`size-btn ${filters.size === 'Todos' ? 'active' : ''}`}
-                                        name="size"
-                                        value="Todos"
-                                        onClick={handleFilterChange}
-                                    >
-                                        Todas
-                                    </button>
-                                    {availableSizes.map(size => (
-                                        <button
-                                            key={`size-${size}`}
-                                            className={`size-btn ${filters.size === size ? 'active' : ''}`}
-                                            name="size"
-                                            value={size}
-                                            onClick={handleFilterChange}
-                                        >
-                                            {size}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        <Button
-                            variant="outline"
-                            className="clear-filters-btn"
-                            onClick={() => setFilters({ type: 'Todos', size: 'Todos', search: '' })}
-                        >
-                            Limpiar Filtros
-                        </Button>
-                    </aside>
+                    <ProductSidebar
+                        isFilterOpen={isFilterOpen}
+                        setIsFilterOpen={setIsFilterOpen}
+                        filters={filters}
+                        setFilters={setFilters}
+                        handleFilterChange={handleFilterChange}
+                        currentTypeHasSizes={currentTypeHasSizes}
+                        availableSizes={availableSizes}
+                    />
 
                     {/* Products Grid */}
                     <main className="products-main">
@@ -286,7 +180,10 @@ const Products = () => {
                                 <div className="rec-section-header">
                                     <div className="rec-section-title-area">
                                         <span className="rec-section-badge">Recomendados para ti</span>
-                                        <h2>Productos sugeridos para <strong>{childData.name}</strong> 👶</h2>
+                                        <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            Productos sugeridos para <strong>{childData.name}</strong> 
+                                            <Baby size={28} color="#ea580c" />
+                                        </h2>
                                         <p>Basado en su talla (<strong>{childData.diaperSize}</strong>) y su piel (<strong>{childData.skinType === 'sensitive' ? 'Sensible' : childData.skinType === 'atopic' ? 'Muy Sensible / Atópica' : 'Normal'}</strong>)</p>
                                     </div>
                                 </div>
@@ -295,10 +192,14 @@ const Products = () => {
                                         <Card key={`rec-${product.id}`} className="product-card rec-product-card-highlight">
                                             <div className="product-image">
                                                 <img src={product.image} alt={product.name} />
+                                                <div className="product-badges">
+                                                    <div className="rec-card-badge">★ Recomendado</div>
+                                                </div>
                                                 {product.discountPrice && (
-                                                    <div className="discount-badge">Oferta</div>
+                                                    <div className="product-badges-bottom">
+                                                        <div className="discount-badge">Oferta</div>
+                                                    </div>
                                                 )}
-                                                <div className="rec-card-badge">★ Recomendado</div>
                                             </div>
                                             <div className="product-content">
                                                 <div className="product-tags">
@@ -321,7 +222,7 @@ const Products = () => {
                                                         <span className="current-price">{formatPrice(product.price)}</span>
                                                     )}
                                                 </div>
-                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '10px' }}>
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: 'auto' }}>
                                                     <Button variant="outline" className="view-details-btn" onClick={() => handleProductClick(product)} style={{ width: '100%', padding: '8px', fontSize: '0.9rem' }}>
                                                         Ver Detalles
                                                     </Button>
@@ -345,10 +246,10 @@ const Products = () => {
                                             <span>¿Te resultaron útiles estas sugerencias para tu bebé?</span>
                                             <div className="feedback-btn-group">
                                                 <button className="feedback-sub-btn yes-btn" onClick={() => handleFeedbackProducts('useful')}>
-                                                    Sí 👍
+                                                    Sí <ThumbsUp size={16} />
                                                 </button>
                                                 <button className="feedback-sub-btn no-btn" onClick={() => handleFeedbackProducts('not_useful')}>
-                                                    No 👎
+                                                    No <ThumbsDown size={16} />
                                                 </button>
                                             </div>
                                         </div>
@@ -382,7 +283,9 @@ const Products = () => {
                                         <div className="product-image">
                                             <img src={product.image} alt={product.name} />
                                             {product.discountPrice && (
-                                                <div className="discount-badge">Oferta</div>
+                                                <div className="product-badges-bottom">
+                                                    <div className="discount-badge">Oferta</div>
+                                                </div>
                                             )}
                                         </div>
                                         <div className="product-content">
@@ -409,7 +312,7 @@ const Products = () => {
                                                 )}
                                             </div>
 
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '10px' }}>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: 'auto' }}>
                                                 <Button variant="outline" className="view-details-btn" onClick={() => handleProductClick(product)} style={{ width: '100%', padding: '8px', fontSize: '0.9rem' }}>
                                                     Ver Detalles
                                                 </Button>
@@ -437,6 +340,22 @@ const Products = () => {
                     </main>
                 </div>
             </div>
+
+            {/* Cart FAB — visible on mobile since cart was removed from BottomNav */}
+            <button
+                className="products-cart-fab"
+                onClick={toggleCart}
+                aria-label="Abrir carrito"
+            >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="22" height="22">
+                    <circle cx="9" cy="21" r="1" />
+                    <circle cx="20" cy="21" r="1" />
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                </svg>
+                {cartItemsCount > 0 && (
+                    <span className="products-cart-fab__badge">{cartItemsCount}</span>
+                )}
+            </button>
         </div>
     );
 };

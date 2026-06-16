@@ -1,0 +1,115 @@
+.tutorial-floating-box {
+    position: fixed;
+    bottom: 85px; /* Above BottomNav */
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 32px);
+    max-width: 400px;
+    z-index: 10000;
+    pointer-events: none; /* Let clicks pass through the container... */
+    animation: slideUpFloat 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.tutorial-floating-content {
+    background: var(--color-bg-white);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+    border: 2px solid var(--color-primary);
+    pointer-events: auto; /* ...but catch them on the content box */
+    position: relative;
+}
+
+/* Little triangle pointing down/up depending on position */
+.tutorial-floating-content::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid var(--color-primary);
+}
+
+@keyframes slideUpFloat {
+    from { transform: translate(-50%, 40px); opacity: 0; }
+    to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+.tutorial-float-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--color-primary-dark);
+    margin: 0 0 var(--spacing-xs);
+}
+
+.tutorial-float-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-main);
+    line-height: 1.4;
+    margin: 0 0 var(--spacing-md);
+}
+
+.tutorial-float-footer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.tutorial-float-dots {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+}
+
+.tutorial-float-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    background-color: #E5E7EB;
+    transition: all 0.3s ease;
+}
+
+.tutorial-float-dot.active {
+    width: 18px;
+    background-color: var(--color-primary);
+}
+
+.tutorial-float-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.tutorial-float-skip {
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.tutorial-float-next {
+    padding: var(--spacing-xs) var(--spacing-md) !important;
+    font-size: 0.9rem !important;
+}
+
+@media (min-width: 900px) {
+    .tutorial-floating-box {
+        bottom: 30px; /* Desktop doesn't have bottom nav, move it down */
+        left: 30px;
+        transform: none;
+    }
+    
+    @keyframes slideUpFloat {
+        from { transform: translateY(40px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    .tutorial-floating-content::after {
+        display: none; /* Hide arrow on desktop */
+    }
+}

@@ -1,31 +1,35 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext } from 'react';
 
 const AuthContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [user, setUser] = useState(null);
-    const [childData, setChildData] = useState(null);
-
-    // Initial load
-    useEffect(() => {
-        const storedAuth = localStorage.getItem('huggies_auth');
-        if (storedAuth === 'true') {
-            setIsAuthenticated(true);
-            setUser({ name: 'Usuario Prueba', email: 'usuario@ejemplo.com' });
-        }
-
+    const [isAuthenticated, setIsAuthenticated] = useState(() => {
+        return localStorage.getItem('huggies_auth') === 'true';
+    });
+    const [user, setUser] = useState(() => {
+        return localStorage.getItem('huggies_auth') === 'true' 
+            ? { name: 'Usuario Prueba', email: 'usuario@ejemplo.com' } 
+            : null;
+    });
+    const [childData, setChildData] = useState(() => {
         const storedChild = localStorage.getItem('huggies_child_data');
         if (storedChild) {
             try {
-                setChildData(JSON.parse(storedChild));
+                return JSON.parse(storedChild);
             } catch (e) {
                 console.error("Error parsing child data", e);
             }
         }
-    }, []);
+        return null;
+    });
+    
+    // Tutorial state
+    const [hasSeenTutorial, setHasSeenTutorial] = useState(() => {
+        return localStorage.getItem('huggies_tutorial_completed') === 'true';
+    });
 
     const login = () => {
         setIsAuthenticated(true);
@@ -44,6 +48,8 @@ export const AuthProvider = ({ children }) => {
             setChildData(null);
             localStorage.removeItem('huggies_child_data');
             localStorage.removeItem('huggies_onboarding_completed');
+            localStorage.removeItem('huggies_tutorial_completed');
+            setHasSeenTutorial(false);
         } else {
             const updated = { ...childData, ...newData };
             setChildData(updated);
@@ -52,8 +58,17 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const completeTutorial = () => {
+        setHasSeenTutorial(true);
+        localStorage.setItem('huggies_tutorial_completed', 'true');
+    };
+
     return (
-        <AuthContext.Provider value={{ isAuthenticated, user, login, logout, childData, updateChildData }}>
+        <AuthContext.Provider value={{ 
+            isAuthenticated, user, login, logout, 
+            childData, updateChildData,
+            hasSeenTutorial, completeTutorial
+        }}>
             {children}
         </AuthContext.Provider>
     );

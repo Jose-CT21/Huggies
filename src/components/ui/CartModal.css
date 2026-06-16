@@ -213,3 +213,10 @@
         transform: translateX(0);
     }
 }
+
+/* Fix overlapping with BottomNav on mobile/tablet */
+@media (max-width: 900px) {
+    .cart-content {
+        padding-bottom: 90px;
+    }
+}

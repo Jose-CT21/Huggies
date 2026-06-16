@@ -10,6 +10,18 @@ html, body {
     overflow-x: hidden;
 }
 
+/* Ensure pages have enough bottom spacing for BottomNav on mobile */
+@media (max-width: 900px) {
+    .products-page,
+    .rewards-page,
+    .community-page,
+    .account-page,
+    .store-locator-page,
+    main {
+        padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+}
+
 body {
     font-family: var(--font-family-base);
     background-color: var(--color-bg-light);
