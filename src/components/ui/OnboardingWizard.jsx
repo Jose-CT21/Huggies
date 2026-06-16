@@ -25,7 +25,6 @@ const OnboardingWizard = () => {
     const [selectedInterests, setSelectedInterests] = useState([]);
 
     // Constants for birth date ranges (dynamic based on Today)
-    const today = new Date();
 
     // Adjust state during render when childData changes (e.g. on reset/restart onboarding)
     if (childData !== prevChildData) {

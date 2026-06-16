@@ -114,14 +114,18 @@ const CustomDatePicker = ({ birthDate, setBirthDate }) => {
 
     // Sync calendar focus year and month when birthDate changes or gets reset
     useEffect(() => {
-        if (birthDate) {
-            const [y, m] = birthDate.split('-').map(Number);
-            setCalYear(y);
-            setCalMonth(m - 1);
-        } else {
-            setCalYear(today.getFullYear());
-            setCalMonth(today.getMonth());
-        }
+        const timer = setTimeout(() => {
+            if (birthDate) {
+                const [y, m] = birthDate.split('-').map(Number);
+                setCalYear(y);
+                setCalMonth(m - 1);
+            } else {
+                const now = new Date();
+                setCalYear(now.getFullYear());
+                setCalMonth(now.getMonth());
+            }
+        }, 0);
+        return () => clearTimeout(timer);
     }, [birthDate]); // Only react when birthDate prop changes
 
     return (

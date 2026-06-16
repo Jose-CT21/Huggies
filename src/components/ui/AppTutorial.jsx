@@ -53,7 +53,8 @@ const AppTutorial = () => {
             }, 1000);
             return () => clearTimeout(timer);
         } else {
-            setIsVisible(false);
+            const timer = setTimeout(() => setIsVisible(false), 0);
+            return () => clearTimeout(timer);
         }
     }, [childData, hasSeenTutorial]);
 

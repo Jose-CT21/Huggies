@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Button from '../ui/Button';
 import CartIcon from '../ui/icons/CartIcon';
 import StarIcon from '../ui/icons/StarIcon';
@@ -11,6 +11,7 @@ const Navbar = () => {
     const [scrolled, setScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
     const { isAuthenticated, logout } = useAuth();
     const { cartItems, pointsBalance, toggleCart } = useCart();
 
@@ -36,8 +37,10 @@ const Navbar = () => {
         setMobileMenuOpen(false);
     };
 
+    const isDarkTheme = location.pathname === '/hugs';
+
     return (
-        <nav className={`navbar ${scrolled ? 'navbar--scrolled' : ''}`}>
+        <nav className={`navbar ${scrolled ? 'navbar--scrolled' : ''} ${isDarkTheme ? 'navbar--dark' : ''}`}>
             <div className="container navbar__inner">
                 <div className="navbar__logo">
                     <Link to="/" className="logo-text" style={{ textDecoration: 'none' }} onClick={closeMobileMenu}>Huggies</Link>

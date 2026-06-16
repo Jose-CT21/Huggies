@@ -1,11 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import ProductSidebar from '../components/ProductSidebar';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { productTypes } from '../data/huggiesCatalog';
+
 import { useProductFilters } from '../hooks/useProductFilters';
 import { Baby, ThumbsUp, ThumbsDown } from 'lucide-react';
 import Swal from 'sweetalert2';

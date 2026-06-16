@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
 import HugCard from '../components/hugs/HugCard';
 import { hugsVideos } from '../data/hugsData';
 import './Hugs.css';
@@ -7,10 +9,11 @@ import './Hugs.css';
  * Hugs — Full-screen vertical video feed page (TikTok/Reels style).
  * Uses IntersectionObserver to detect which video is in viewport and auto-play it.
  */
+const MySwal = withReactContent(Swal);
+
 const Hugs = () => {
     const [activeIndex, setActiveIndex] = useState(0);
     const containerRef = useRef(null);
-    const cardRefs = useRef([]);
     const isScrolling = useRef(false);
     const touchStartY = useRef(0);
 
@@ -26,6 +29,31 @@ const Hugs = () => {
             }
             return prev;
         });
+    }, []);
+
+    // Show disclaimer on first visit
+    useEffect(() => {
+        const hasSeenDisclaimer = localStorage.getItem('huggies_hugs_disclaimer_seen');
+        if (!hasSeenDisclaimer) {
+            MySwal.fire({
+                title: 'Aviso Importante de Seguridad',
+                html: `
+                    <p style="font-size: 1rem; line-height: 1.5; color: #4B5563; text-align: left; margin-bottom: 10px;">
+                        Queremos recordarte la importancia de proteger la privacidad de los menores en internet. Te sugerimos <strong>evitar publicar videos o fotos donde se reconozca el rostro de niños o bebés</strong> en redes sociales públicas.
+                    </p>
+                    <p style="font-size: 0.9rem; line-height: 1.5; color: #6B7280; text-align: left;">
+                        <em>Nota: Los videos aquí mostrados son ilustrativos. Huggies no se hace responsable por el mal uso o la distribución no autorizada de contenido generado por los usuarios.</em>
+                    </p>
+                `,
+                icon: 'info',
+                confirmButtonText: 'Entendido',
+                confirmButtonColor: '#0288D1',
+                allowOutsideClick: false,
+                allowEscapeKey: false
+            }).then(() => {
+                localStorage.setItem('huggies_hugs_disclaimer_seen', 'true');
+            });
+        }
     }, []);
 
     // Handle mouse wheel for strict video-by-video scrolling
@@ -75,11 +103,7 @@ const Hugs = () => {
 
     return (
         <div className="hugs-page">
-            {/* Header */}
-            <div className="hugs-page__header">
-                <h2 className="hugs-page__title">Hugs</h2>
-                <p className="hugs-page__subtitle">Tips y momentos para tu bebé</p>
-            </div>
+
 
             {/* Feed container */}
             <div className="hugs-feed" ref={containerRef}>

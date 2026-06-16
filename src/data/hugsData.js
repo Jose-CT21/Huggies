@@ -12,6 +12,46 @@
 
 export const hugsVideos = [
     {
+        id: 'hug-tiktok-1',
+        type: 'tiktok',
+        tiktokId: '7649049001727233301',
+        cite: 'https://www.tiktok.com/@allisonbrenes15/video/7649049001727233301',
+        creator: 'allisonbrenes15',
+        description: 'Mi corazón de mamá se siente muy agradecido ✨❤️ @Huggies Centroamérica'
+    },
+    {
+        id: 'hug-tiktok-2',
+        type: 'tiktok',
+        tiktokId: '7377816858117852422',
+        cite: 'https://www.tiktok.com/@diana_dijeres/video/7377816858117852422',
+        creator: 'diana_dijeres',
+        description: 'Vine el 06 de junio .. por aquello de las ofertas 🫣🙌🏻😉'
+    },
+    {
+        id: 'hug-tiktok-3',
+        type: 'tiktok',
+        tiktokId: '7637713133338938642',
+        cite: 'https://www.tiktok.com/@monicasegura__/video/7637713133338938642',
+        creator: 'monicasegura__',
+        description: 'Para mí son de los mejores de Huggies, también de esta línea hay tipo pants pero no los he probado😢'
+    },
+    {
+        id: 'hug-tiktok-4',
+        type: 'tiktok',
+        tiktokId: '7636526061819350286',
+        cite: 'https://www.tiktok.com/@huggies/video/7636526061819350286',
+        creator: 'huggies',
+        description: 'Cannot believe how tiny the first one is compared to where they are now'
+    },
+    {
+        id: 'hug-tiktok-5',
+        type: 'tiktok',
+        tiktokId: '7652066153396800782',
+        cite: 'https://www.tiktok.com/@huggies/video/7652066153396800782',
+        creator: 'huggies',
+        description: 'her party, her rules, her hat 🥳'
+    },
+    {
         id: 'hug-1',
         // Video placeholder: bebé jugando (vertical)
         videoUrl: 'https://videos.pexels.com/video-files/3252004/3252004-sd_360_640_25fps.mp4',

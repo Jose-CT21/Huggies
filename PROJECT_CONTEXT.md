@@ -12,6 +12,7 @@ Este archivo contiene la arquitectura completa, estructura de archivos, estánda
 | Build Tool     | Vite                                | ^7.3.1    |
 | Routing        | react-router-dom                    | ^7.13.1   |
 | Alertas/Modals | sweetalert2 + sweetalert2-react-content | ^11.26.25 |
+| Iconos         | lucide-react                        | ^1.18.0   |
 | Estilos        | Vanilla CSS (sin Tailwind)          | —         |
 | Tipografía     | Google Fonts — Inter                | —         |
 | Linting        | ESLint + eslint-plugin-react-hooks  | ^9.39.1   |
@@ -21,7 +22,7 @@ Este archivo contiene la arquitectura completa, estructura de archivos, estánda
 
 ## 📁 Estructura del Proyecto y Mapa de Archivos
 
-```
+```text
 huggies-web/
 ├── index.html                    # Punto de entrada HTML principal
 ├── vite.config.js                # Configuración de Vite con React
@@ -29,7 +30,7 @@ huggies-web/
 ├── eslint.config.js              # Reglas de linting de ESLint
 │
 ├── public/                       # Assets estáticos (imágenes de fondo y productos)
-│   └── product_images/           # Imágenes de productos (Supreme, Active Sec, Pants, Toallitas)
+│   └── product_images/           # Imágenes de productos
 │
 └── src/
     ├── main.jsx                  # Renderizado principal y envoltura de la App
@@ -49,113 +50,114 @@ huggies-web/
     ├── data/                     # 📊 Datos Estáticos
     │   ├── huggiesCatalog.js     # Catálogo con 20 productos de pañales, pants, toallitas y cuidado
     │   ├── communityData.js      # Datos iniciales para la comunidad de padres
-    │   └── dummyData.js          # Datos estáticos para landing, categorías y blogs
+    │   ├── dummyData.js          # Datos estáticos para landing, categorías y blogs
+    │   ├── developmentalStages.js# Datos de etapas de desarrollo del bebé
+    │   ├── hugsData.js           # Datos para la funcionalidad de Hugs (comunidad)
+    │   └── onboardingData.js     # Datos de soporte para el proceso de onboarding
+    │
+    ├── hooks/                    # 🎣 Custom Hooks
+    │   └── useProductFilters.js  # Lógica de filtrado de productos
+    │
+    ├── utils/                    # 🛠️ Utilidades y Servicios
+    │   └── aiChatService.js      # Servicio del asistente virtual de IA
     │
     ├── components/               # 🧩 Componentes Reutilizables
-    │   ├── home/                 # Componentes exclusivos de la página de inicio
-    │   │   ├── Hero.jsx / .css                        # Banner principal con CTA
-    │   │   ├── PersonalizedRecommendations.jsx / .css # Recomendaciones personalizadas según la edad del bebé
-    │   │   ├── ProductCategories.jsx / .css           # Tarjetas de categorías principales
-    │   │   ├── Features.jsx / .css                    # Beneficios principales de los productos
-    │   │   ├── RewardsPromo.jsx / .css                # Banner promocional del programa de recompensas
-    │   │   └── ArticleCarousel.jsx / .css             # Carrusel de artículos del blog
+    │   ├── ProductSidebar.jsx    # Barra lateral de filtros para el catálogo
+    │   │
+    │   ├── home/                 # Componentes de la página de inicio
+    │   │   ├── Hero.jsx / .css
+    │   │   ├── BabyDashboard.jsx / .css               # Panel de control de la etapa del bebé
+    │   │   ├── PersonalizedRecommendations.jsx / .css
+    │   │   ├── ProductCategories.jsx / .css
+    │   │   ├── Features.jsx / .css
+    │   │   ├── RewardsPromo.jsx / .css
+    │   │   ├── ArticleCarousel.jsx / .css
+    │   │   ├── ProductMarquee.jsx / .css              # Carrusel de productos en movimiento
+    │   │   └── UserRegistrationPromo.jsx / .css
     │   │
     │   ├── layout/               # Componentes estructurales persistentes
-    │   │   ├── Navbar.jsx / .css          # Barra de navegación superior
-    │   │   ├── Footer.jsx / .css          # Pie de página
-    │   │   └── BottomNav.jsx / .css       # Barra de navegación inferior móvil
+    │   │   ├── Navbar.jsx / .css
+    │   │   ├── Footer.jsx / .css
+    │   │   └── BottomNav.jsx / .css
     │   │
-    │   └── ui/                   # Componentes de interfaz de usuario genéricos
-    │       ├── Button.jsx / .css          # Botón personalizado con variantes
-    │       ├── Card.jsx / .css            # Tarjetas contenedor con efecto hover
-    │       ├── CartModal.jsx / .css       # Drawer lateral del carrito de compras
-    │       ├── OnboardingWizard.jsx / .css # Modal interactivo de 5 pasos para registrar al bebé
-    │       ├── ScrollToTopButton.jsx / .css # Botón flotante para subir
-    │       ├── AIAssistant.jsx / .css     # Asistente virtual de IA con recomendaciones y chat
-    │       └── icons/                     # Iconos SVG reutilizables (CartIcon, StarIcon)
+    │   ├── ui/                   # Componentes de interfaz genéricos
+    │   │   ├── Button.jsx / .css
+    │   │   ├── Card.jsx / .css
+    │   │   ├── CartModal.jsx / .css
+    │   │   ├── OnboardingWizard.jsx / .css
+    │   │   ├── AppTutorial.jsx / .css                 # Tutorial introductorio de la App
+    │   │   ├── CustomDatePicker.jsx                   # Selector de fecha personalizado
+    │   │   ├── ScrollToTopButton.jsx / .css
+    │   │   ├── AIAssistant.jsx / .css
+    │   │   └── icons/                                 # Iconos SVG
+    │   │
+    │   └── hugs/                 # Componentes para la red "Hugs"
+    │       ├── HugCard.jsx                            # Tarjeta de publicación de un "Hug"
+    │       └── HugComments.jsx / .css                 # Sección de comentarios de un "Hug"
     │
-    └── pages/                    # 📄 Vistas Principales (Cargadas mediante lazy loading)
-        ├── Home.jsx              # Landing Page compuesta
+    └── pages/                    # 📄 Vistas Principales
+        ├── Home.jsx              # Landing Page
         ├── Products.jsx / .css   # Catálogo interactivo con filtros
         ├── ProductDetail.jsx / .css # Ficha de detalle de producto
-        ├── Community.jsx / .css  # Red social (posts, likes, comentarios, crear posts)
+        ├── Community.jsx / .css  # Red social (posts, likes, comentarios)
+        ├── Hugs.jsx / .css       # Sección interactiva "Hugs" (evolución de comunidad)
         ├── Login.jsx / .css      # Registro e inicio de sesión
         ├── ForgotPassword.jsx / .css # Recuperación de contraseña
-        ├── Account.jsx / .css    # Perfil del usuario e información de la cuenta
-        ├── Rewards.jsx / .css    # Dashboard de Huggies Rewards (canje de puntos)
+        ├── Account.jsx / .css    # Perfil del usuario
+        ├── Rewards.jsx / .css    # Dashboard de Huggies Rewards
         ├── Checkout.jsx / .css   # Pasarela de pago simulada
         ├── OrderSuccess.jsx / .css # Confirmación de compra exitosa
-        ├── ArticleDetail.jsx / .css # Ficha de detalle para artículos del blog
-        └── StoreLocator.jsx / .css # Localizador de tiendas físicas y puntos de venta
+        ├── ArticleDetail.jsx / .css # Detalle para artículos del blog
+        └── StoreLocator.jsx / .css # Localizador de tiendas físicas
 ```
 
 ---
 
 ## 🎨 Convenciones de Diseño y CSS
 
-1. **Vanilla CSS**: El proyecto utiliza Vanilla CSS puro y estructurado. **NO se debe usar TailwindCSS**, frameworks utilitarios o librerías de componentes (como Material UI o Bootstrap) a menos que sea explícitamente requerido.
+1. **Vanilla CSS**: El proyecto utiliza Vanilla CSS puro y estructurado. **NO se debe usar TailwindCSS**, frameworks utilitarios o librerías de componentes.
 2. **Variables de Diseño (Design Tokens)**:
    - Todo color, espaciado, sombra o radio de borde debe obtenerse de `src/styles/variables.css` mediante `var(--...)`.
-   - **No quemar códigos hexadecimales** en los archivos `.css` locales de componentes (ej. usar `var(--color-primary)` en lugar de `#D32F2F`).
+   - **No quemar códigos hexadecimales** en los `.css`.
 3. **Responsive Web Design**:
-   - Todo componente debe verse excelente en un rango de pantallas desde 320px hasta 1440px.
-   - Evitar `white-space: nowrap` en textos descriptivos o etiquetas que puedan empujar el ancho del contenedor en pantallas pequeñas.
-   - Apilar elementos que usen `flex` o `grid` horizontal en dispositivos móviles usando `@media (max-width: 480px)`.
-   - Los modales o tarjetas overlay en móviles deben ajustar su padding a `var(--spacing-md)` (16px) y definir límites de altura con scroll (`overflow-y: auto`).
+   - Todo componente debe verse excelente desde 320px hasta 1440px.
+   - Apilar elementos en móviles usando `@media (max-width: 480px)`.
+   - Los modales en móviles deben ajustar padding y definir límites de altura con scroll.
 
 ---
 
 ## ₡ Reglas de Negocio Específicas
 
 1. **Precios en Colones Costarricenses**:
-   - La moneda del sitio es el colón costarricense (`₡`).
-   - Los precios deben formatearse utilizando el formato local en español (`es-CR`), es decir, separador de miles con punto o coma apropiados.
-   - Utilizar la función de formateo común:
-     ```javascript
-     const formatPrice = (amount) => `₡${amount.toLocaleString('es-CR')}`;
-     ```
+   - Moneda: Colón costarricense (`₡`). Formato: `es-CR`.
+   - `const formatPrice = (amount) => "₡" + amount.toLocaleString('es-CR');`
 2. **Productos sin Talla**:
-   - Ciertas categorías de productos (como *Toallitas húmedas* y artículos de *Cuidado de la piel*) tienen `size: null`.
-   - Si se filtra por una categoría sin tallas, el filtro de tallas debe ocultarse dinámicamente y con transiciones visuales limpias.
-   - En las vistas de producto y carrito, no debe mostrarse el texto de Talla ni Rangos de peso si el valor es nulo.
+   - Categorías como *Toallitas húmedas* y *Cuidado de la piel* tienen `size: null`.
+   - El filtro de tallas debe ocultarse dinámicamente si se seleccionan estas categorías.
 
 ---
 
 ## ⚡ Calidad de Código y Estándares de React 19
 
-1. **Componentes Puros (Idempotencia)**:
-   - Evitar el uso de funciones impuras (como `Math.random()`, `new Date()`) directamente en el cuerpo del renderizado, ya que producen resultados inestables entre renders y activan advertencias estrictas en React 19.
-   - Las claves aleatorias o identificadores únicos dinámicos deben inicializarse en un hook `useEffect` o generarse como constantes externas al ciclo de render.
-2. **Gestión Eficiente del Estado (Evitar bucles de renderizado)**:
-   - Evitar llamar a funciones de cambio de estado (`setState`) de forma síncrona dentro de un `useEffect` si esto puede solucionarse inicializando el estado con valores por defecto o mediante eventos directos de interacción. Esto previene re-renderizados en cascada ineficientes.
-3. **Fast Refresh y Exports**:
-   - Los archivos de componentes React (`.jsx`) deben exportar únicamente componentes React. Las constantes comunes o funciones auxiliares pesadas deben ubicarse en archivos JavaScript dedicados (como `src/data/` o funciones helper) para no romper el mecanismo de Fast Refresh de Vite.
-4. **Optimización de Carga (Lazy Loading)**:
-   - Las páginas principales dentro de `src/App.jsx` deben cargarse perezosamente utilizando `React.lazy` combinado con `<Suspense>` para mantener el bundle inicial lo más ligero y rápido posible.
-5. **SEO y Semántica HTML**:
-   - Utilizar etiquetas semánticas de HTML5 (`<header>`, `<section>`, `<main>`, `<article>`, `<footer>`).
-   - Mantener títulos descriptivos por página y asegurar que los elementos interactivos tengan identificadores lógicos o roles accesibles.
+1. **Componentes Puros**: Evitar llamadas impuras (`Date.now()`, `Math.random()`) dentro del render.
+2. **Gestión de Estado Eficiente**: Evitar setters de estado síncronos en `useEffect` que puedan causar re-renders en cascada.
+3. **Fast Refresh**: Exportar solo componentes de React en archivos `.jsx`. Lógicas, constantes, y hooks se extraen a `/utils`, `/data` y `/hooks`.
+4. **Lazy Loading**: Rutas grandes con `React.lazy` y `<Suspense>`.
 
 ---
 
 ## 🚀 Últimos Cambios y Avances Recientes
 
-1. **Onboarding Flow (`OnboardingWizard`)**:
-   - Se añadió un modal interactivo de 5 pasos para recolectar información sobre el bebé (nombre, fecha de nacimiento o fecha estimada de parto, peso, etc.).
-   - La información se almacena en el `AuthContext` bajo `childData` y es editable desde la página de perfil (`Account.jsx`).
-2. **Recomendaciones Personalizadas (`PersonalizedRecommendations`)**:
-   - Muestra productos recomendados dinámicamente según la edad en meses del bebé calculada a partir de los datos ingresados en el onboarding o el perfil.
-3. **Asistente de IA (`AIAssistant`)**:
-   - Chat virtual interactivo flotante para guiar a los padres, responder dudas frecuentes de crianza y recomendar el pañal ideal.
-4. **Flujo de Compra y Checkout**:
-   - Se implementaron las páginas de Detalle de Producto (`ProductDetail`), Checkout simulado (`Checkout`) con validación de campos, y Confirmación de Compra (`OrderSuccess`).
-5. **Localizador de Tiendas (`StoreLocator`) y Detalle de Blog (`ArticleDetail`)**:
-   - Se crearon vistas dedicadas para buscar tiendas físicas que venden productos Huggies y ver detalles completos de los artículos del blog.
-6. **Optimización y Limpieza de Código (React 19)**:
-   - Se eliminaron y resolvieron más de 15 advertencias/errores de ESLint a lo largo de toda la base de código.
-   - Se eliminaron hooks `useEffect` redundantes reemplazándolos por inicialización perezosa de estados (`useState(() => ...)`) y ajustes de estado en tiempo de renderizado.
-   - Se preservó la idempotencia y pureza de los componentes en React 19 extrayendo llamadas impuras (como `Date.now()` o `Math.random()`) fuera de las funciones de render.
-7. **Refactorización Arquitectónica y Estabilidad (Avances Recientes)**:
-   - **Modularización:** Extracción de lógica compleja de componentes de interfaz (ej. lógica de filtros a `useProductFilters.js`, chat de IA a `aiChatService.js`, datos estáticos de onboarding a `onboardingData.js`).
-   - **Manejo de Errores:** Implementación de un `ErrorBoundary` global (`react-error-boundary`) en `App.jsx` para evitar pantallas blancas (white screens of death) al navegar, mostrando un fallback controlado.
-   - **Refinamiento de UI Responsiva:** Corrección de la superposición del `BottomNav` móvil sobre el modal del carrito, y separación visual de los tags de producto (Recomendado y Oferta) para mejorar la usabilidad.
+1. **Sección "Hugs" (`Hugs.jsx`, `HugCard.jsx`, `HugComments.jsx`)**:
+   - Introducción de un entorno tipo red social interactivo para la comunidad de padres, con tarjetas de posteos de otros padres (Hugs) y secciones de comentarios independientes.
+2. **Componentes Home Evolucionados**:
+   - Se agregaron `BabyDashboard`, `ProductMarquee` y `UserRegistrationPromo` para hacer la página de inicio más dinámica, interactiva y enfocada en el crecimiento actual del bebé.
+3. **Tutorial y Utilidades Visuales (`AppTutorial`, `CustomDatePicker`)**:
+   - Introducción de un tutorial guiado (`AppTutorial`) para que los usuarios aprendan a usar la app.
+   - Selector de fechas optimizado (`CustomDatePicker`) para registro de nacimiento.
+4. **Modularización Avanzada**:
+   - Extracción de toda la lógica de filtrado a `src/hooks/useProductFilters.js`.
+   - Extracción de la lógica de IA a `src/utils/aiChatService.js`.
+   - Nuevos archivos de datos (`developmentalStages.js`, `hugsData.js`) para sostener las nuevas características de la app.
+5. **Manejo de Errores y UI**:
+   - Se mantienen las mejoras en estabilidad con `ErrorBoundary` y la compatibilidad estricta con React 19. Incorporación de iconos con `lucide-react`.

@@ -1,73 +1,65 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useState } from 'react';
 import './ProductMarquee.css';
 import { useNavigate } from 'react-router-dom';
 
-const ProductMarquee = ({ title, products, direction = 'left', speed = 0.5 }) => {
+const ProductMarquee = ({ title, products }) => {
     const navigate = useNavigate();
     const trackRef = useRef(null);
-    const [isPaused, setIsPaused] = useState(false);
-    const animationRef = useRef(null);
+    
+    // Drag state
+    const [isDragging, setIsDragging] = useState(false);
+    const [hasDragged, setHasDragged] = useState(false);
+    const [startX, setStartX] = useState(0);
+    const [scrollLeft, setScrollLeft] = useState(0);
 
-    // Duplicate products to ensure enough content for infinite scrolling
-    // We duplicate multiple times so it fills wide screens
-    const duplicatedProducts = [...products, ...products, ...products, ...products];
+    const handleMouseDown = (e) => {
+        setIsDragging(true);
+        setHasDragged(false);
+        setStartX(e.pageX - trackRef.current.offsetLeft);
+        setScrollLeft(trackRef.current.scrollLeft);
+    };
 
-    const animate = useCallback(() => {
-        if (!trackRef.current || isPaused) {
-            animationRef.current = requestAnimationFrame(animate);
-            return;
+    const handleMouseLeave = () => {
+        setIsDragging(false);
+    };
+
+    const handleMouseUp = () => {
+        setIsDragging(false);
+    };
+
+    const handleMouseMove = (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        setHasDragged(true);
+        const x = e.pageX - trackRef.current.offsetLeft;
+        const walk = (x - startX) * 2; // Scroll speed multiplier
+        trackRef.current.scrollLeft = scrollLeft - walk;
+    };
+
+    const handleProductClick = (productId) => {
+        // Prevent click if the user was dragging
+        if (!hasDragged) {
+            navigate(`/product/${productId}`);
         }
-
-        const track = trackRef.current;
-        if (direction === 'left') {
-            track.scrollLeft += speed;
-            // If scrolled past 1/4 of total scroll width (which is one full set of products)
-            // silently jump back to create infinite illusion
-            if (track.scrollLeft >= track.scrollWidth / 4) {
-                track.scrollLeft -= track.scrollWidth / 4;
-            }
-        } else {
-            // For right scrolling, if at the beginning, jump forward
-            if (track.scrollLeft <= 0) {
-                track.scrollLeft += track.scrollWidth / 4;
-            }
-            track.scrollLeft -= speed;
-        }
-
-        animationRef.current = requestAnimationFrame(animate);
-    }, [direction, isPaused, speed]);
-
-    useEffect(() => {
-        // Initial setup for 'right' direction to avoid jumping
-        if (direction === 'right' && trackRef.current) {
-            trackRef.current.scrollLeft = trackRef.current.scrollWidth / 4;
-        }
-        
-        animationRef.current = requestAnimationFrame(animate);
-        return () => cancelAnimationFrame(animationRef.current);
-    }, [animate, direction]);
-
-    // Handlers to pause scrolling on interaction
-    const handlePointerDown = () => setIsPaused(true);
-    const handlePointerUp = () => setIsPaused(false);
+    };
 
     return (
         <section className="product-marquee-section">
             <h2 className="marquee-title">{title}</h2>
             <div className="marquee-container">
                 <div 
-                    className={`marquee-track ${direction}`} 
+                    className={`marquee-track ${isDragging ? 'active' : ''}`} 
                     ref={trackRef}
-                    onMouseEnter={handlePointerDown}
-                    onMouseLeave={handlePointerUp}
-                    onTouchStart={handlePointerDown}
-                    onTouchEnd={handlePointerUp}
+                    onMouseDown={handleMouseDown}
+                    onMouseLeave={handleMouseLeave}
+                    onMouseUp={handleMouseUp}
+                    onMouseMove={handleMouseMove}
                 >
-                    {duplicatedProducts.map((product, idx) => (
+                    {products.map((product, idx) => (
                         <div 
                             key={`${product.id}-${idx}`} 
                             className="marquee-card"
-                            onClick={() => navigate(`/product/${product.id}`)}
+                            onClick={() => handleProductClick(product.id)}
                         >
                             <div className="marquee-card__img-wrapper">
                                 <img src={product.image} alt={product.name} loading="lazy" />

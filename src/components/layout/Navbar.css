@@ -210,3 +210,57 @@
         display: none;
     }
 }
+
+/* ===== DARK THEME VARIANT (For Hugs Page) ===== */
+.navbar--dark {
+    background: transparent;
+}
+
+.navbar--dark.navbar--scrolled {
+    background: rgba(10, 10, 10, 0.85); /* Darker blur background */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.navbar--dark .navbar__logo .logo-text {
+    color: #fff;
+}
+
+.navbar--dark .navbar__links a {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.navbar--dark .navbar__links a:hover {
+    color: #fff;
+}
+
+.navbar--dark .navbar__links a::after {
+    background-color: #fff;
+}
+
+.navbar--dark .mobile-menu-btn span {
+    background-color: #fff;
+}
+
+.navbar--dark .cart-btn {
+    color: #fff;
+}
+
+.navbar--dark .rewards-badge {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.navbar--dark .rewards-badge:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+}
+
+.navbar--dark .ui-button--outline {
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.navbar--dark .ui-button--outline:hover {
+    background-color: #fff;
+    color: #000;
+}

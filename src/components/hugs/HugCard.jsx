@@ -22,6 +22,9 @@ const HugCard = ({ video, isActive }) => {
     const heartTimeout = useRef(null);
     const lastTapTime = useRef(0);
 
+    // For TikTok overlay
+    const [overlayActive, setOverlayActive] = useState(true);
+
     // Auto-play/pause based on visibility
     useEffect(() => {
         const vid = videoRef.current;
@@ -31,7 +34,13 @@ const HugCard = ({ video, isActive }) => {
             vid.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
         } else {
             vid.pause();
-            setIsPlaying(false);
+            const timer = setTimeout(() => setIsPlaying(false), 0);
+            return () => clearTimeout(timer);
+        }
+
+        // Reset overlay when card becomes inactive
+        if (!isActive) {
+            setOverlayActive(true);
         }
     }, [isActive]);
 
@@ -49,8 +58,8 @@ const HugCard = ({ video, isActive }) => {
     }, []);
 
     // Toggle play/pause on tap
-    const handleVideoTap = () => {
-        const now = Date.now();
+    const handleVideoTap = (e) => {
+        const now = e.timeStamp;
         const DOUBLE_TAP_DELAY = 300;
 
         if (now - lastTapTime.current < DOUBLE_TAP_DELAY) {
@@ -63,7 +72,7 @@ const HugCard = ({ video, isActive }) => {
         lastTapTime.current = now;
 
         setTimeout(() => {
-            if (Date.now() - lastTapTime.current >= DOUBLE_TAP_DELAY) {
+            if (performance.now() - lastTapTime.current >= DOUBLE_TAP_DELAY) {
                 // Single tap = toggle play/pause
                 const vid = videoRef.current;
                 if (!vid) return;
@@ -141,6 +150,65 @@ const HugCard = ({ video, isActive }) => {
         if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
         return n.toString();
     };
+
+    useEffect(() => {
+        // No-op for tiktok now, using raw iframe
+    }, [video.type, video.tiktokId]);
+
+    if (video.type === 'tiktok') {
+        // Calculate dynamic styles based on description length
+        // Short text = more top padding added by TikTok natively = we must pull it up (negative top)
+        // Long text = less top padding = we must push it down slightly so it doesn't hide under the menu
+        const textLength = video.description ? video.description.length : 0;
+
+        // Base values
+        let dynamicTop = 0;
+        let dynamicScale = 1.06;
+
+        if (textLength < 40) {
+            // dynamicTop = -15; // Pull up
+            dynamicScale = 1.08;
+        } else if (textLength < 70) {
+            // dynamicTop = -5; // Pull up slightly
+            dynamicScale = 1.07;
+        } else {
+            // dynamicTop = 10; // Push down to avoid menu overlap
+            dynamicScale = 1.05;
+        }
+
+        return (
+            <div className="hug-card" style={{ background: '#000', overflow: 'hidden', position: 'relative' }}>
+                <iframe
+                    src={`https://www.tiktok.com/embed/v2/${video.tiktokId}?autoplay=1&muted=0`}
+                    scrolling="no"
+                    style={{
+                        position: 'absolute',
+                        top: `${dynamicTop}px`,
+                        left: 0,
+                        width: '100%',
+                        height: '100%', // Strict 100% so TikTok doesn't add centering padding
+                        border: 'none',
+                        overflow: 'hidden',
+                        transform: `scale(${dynamicScale})`,
+                        transformOrigin: 'top center' // Pin to the top to avoid overlapping the header
+                    }}
+                    allow="autoplay; encrypted-media; fullscreen"
+                    title="TikTok Video"
+                />
+
+                {/* 
+                    Invisible overlay to capture touch/scroll events for the feed.
+                    If the user taps it, we hide it so they can interact with the TikTok iframe. 
+                */}
+                {overlayActive && (
+                    <div
+                        onClick={() => setOverlayActive(false)}
+                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 10, cursor: 'pointer' }}
+                    />
+                )}
+            </div>
+        );
+    }
 
     return (
         <div className="hug-card">
