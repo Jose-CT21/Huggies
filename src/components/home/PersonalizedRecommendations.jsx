@@ -1,19 +1,15 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
+import { getDevelopmentalStage } from '../../data/developmentalStages';
 import { huggiesCatalog } from '../../data/huggiesCatalog';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
-import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content';
+import { formatPrice } from '../../utils/formatPrice';
+import { getSkinTypeLabel } from '../../utils/labels';
+import { showProductModal } from '../../utils/productModal';
+import { getRecommendedProducts } from '../../utils/recommendations';
 import './PersonalizedRecommendations.css';
-
-const MySwal = withReactContent(Swal);
-
-/** Formatea un precio en colones costarricenses */
-const formatPrice = (amount) => `₡${amount.toLocaleString('es-CR')}`;
-
-import { getDevelopmentalStage } from '../../data/developmentalStages';
 
 const PersonalizedRecommendations = () => {
     const { childData, updateChildData } = useAuth();
@@ -65,52 +61,7 @@ const PersonalizedRecommendations = () => {
         updateChildData(null);
     };
 
-    const handleProductClick = (product) => {
-        MySwal.fire({
-            title: `<h3 style="margin:0; font-size: 1.5rem; color: #1F2937;">${product.name}</h3>`,
-            html: `
-                <div style="text-align: left; padding: 10px 0;">
-                    <div style="text-align: center; margin-bottom: 20px; padding: 20px; background: white; border-radius: 12px; border: 1px solid #E5E7EB;">
-                        <img src="${product.image}" alt="${product.name}" style="max-width: 100%; max-height: 200px; object-fit: contain;" />
-                    </div>
-                    <div style="display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap;">
-                        <span style="background: rgba(2, 136, 209, 0.1); color: #0288D1; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">${product.type}</span>
-                        ${product.size ? `<span style="background: rgba(107, 114, 128, 0.1); color: #4B5563; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">Talla ${product.size}</span>` : ''}
-                        ${product.weightRange ? `<span style="background: rgba(107, 114, 128, 0.1); color: #4B5563; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">${product.weightRange}</span>` : ''}
-                    </div>
-                    <p style="color: #4B5563; font-size: 0.95rem; line-height: 1.5; margin-bottom: 15px;">${product.longDescription || product.description}</p>
-                    ${product.features ? `<ul style="margin-top: 10px; padding-left: 20px; color: #4B5563; font-size: 0.9rem;">${product.features.map(f => `<li style="margin-bottom: 4px;">${f}</li>`).join('')}</ul>` : ''}
-                    <div style="font-size: 1.4rem; font-weight: 800; color: #1F2937; display: flex; align-items: center; gap: 10px; margin-top: 15px;">
-                        ${product.discountPrice ? 
-                            `<span style="color: #D32F2F;">₡${product.discountPrice.toLocaleString('es-CR')}</span>
-                             <span style="text-decoration: line-through; color: #9CA3AF; font-size: 1rem; font-weight: 500;">₡${product.price.toLocaleString('es-CR')}</span>` 
-                            : `<span>₡${product.price.toLocaleString('es-CR')}</span>`}
-                    </div>
-                </div>
-            `,
-            showCancelButton: true,
-            confirmButtonText: 'Agregar al Carrito',
-            cancelButtonText: 'Cerrar',
-            confirmButtonColor: '#D32F2F',
-            cancelButtonColor: '#9CA3AF',
-            customClass: {
-                confirmButton: 'swal-confirm-btn',
-                cancelButton: 'swal-cancel-btn',
-                popup: 'swal-custom-popup'
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                addToCart(product);
-                MySwal.fire({
-                    title: '¡Agregado!',
-                    text: 'El producto se ha añadido a tu carrito.',
-                    icon: 'success',
-                    timer: 1500,
-                    showConfirmButton: false
-                });
-            }
-        });
-    };
+    const handleProductClick = (product) => showProductModal(product, addToCart);
 
     // If no onboarding data exists OR if onboarding was skipped, show invitation
     if (!childData || childData.skipped) {
@@ -139,25 +90,7 @@ const PersonalizedRecommendations = () => {
     if (!stage) return null;
 
     // Filter recommended products based on diaper size or skinType
-    // 1. Primary diaper of their size
-    // 2. Extra Wipes (especially supreme or daily wipes depending on skin sensitivity)
-    const recommendedProducts = huggiesCatalog.filter(product => {
-        // If sensitive skin, prioritize Supreme Care diaper of their size OR Supreme wipes
-        if (skinType === 'sensitive' || skinType === 'atopic') {
-            return (
-                (product.size === diaperSize && product.name.includes('Supreme')) ||
-                (product.type === 'Toallitas' && product.name.includes('Supreme'))
-            );
-        }
-        
-        // For 12+ months, prioritize pants if they have G or XG sizes
-        if (ageInMonths && ageInMonths >= 12 && product.type === 'Pants') {
-            return true;
-        }
-
-        // Default: match diaper size OR show universal wipes
-        return product.size === diaperSize || (product.type === 'Toallitas' && product.size === null);
-    }).slice(0, 3); // show top 3 recommendations
+    const recommendedProducts = getRecommendedProducts(huggiesCatalog, childData, 3);
 
     return (
         <section className="personalized-recommendations container animate-slide-up">
@@ -261,7 +194,7 @@ const PersonalizedRecommendations = () => {
                             <h3>Productos recomendados</h3>
                             <span className="diaper-tag">Talla sugerida: <strong>{diaperSize}</strong></span>
                         </div>
-                        <p className="section-desc">Especialmente seleccionados por talla y sensibilidad de piel ({skinType === 'sensitive' ? 'Sensible' : skinType === 'atopic' ? 'Muy Sensible' : 'Normal'}).</p>
+                        <p className="section-desc">Especialmente seleccionados por talla y sensibilidad de piel ({getSkinTypeLabel(skinType)}).</p>
 
                         <div className="rec-products-list">
                             {recommendedProducts.map(product => (

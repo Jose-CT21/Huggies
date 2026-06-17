@@ -151,10 +151,6 @@ const HugCard = ({ video, isActive }) => {
         return n.toString();
     };
 
-    useEffect(() => {
-        // No-op for tiktok now, using raw iframe
-    }, [video.type, video.tiktokId]);
-
     if (video.type === 'tiktok') {
         // Calculate dynamic styles based on description length
         // Short text = more top padding added by TikTok natively = we must pull it up (negative top)

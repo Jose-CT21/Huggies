@@ -4,11 +4,10 @@ import { useCart } from '../context/CartContext';
 import Button from '../components/ui/Button';
 import './Checkout.css';
 
-/** Formatea un precio en colones costarricenses */
-const formatPrice = (amount) => `₡${amount.toLocaleString('es-CR')}`;
+import { formatPrice } from '../utils/formatPrice';
 
 const Checkout = () => {
-    const { cart, cartTotal, clearCart } = useCart();
+    const { cartItems: cart, cartTotal, clearCart } = useCart();
     const navigate = useNavigate();
 
     const [step, setStep] = useState(1); // 1 = shipping, 2 = payment

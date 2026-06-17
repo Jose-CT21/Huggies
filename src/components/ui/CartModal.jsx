@@ -6,11 +6,10 @@ import Button from './Button';
 import StarIcon from './icons/StarIcon';
 import './CartModal.css';
 
-/** Formatea un precio en colones costarricenses */
-const formatPrice = (amount) => `₡${amount.toLocaleString('es-CR')}`;
+import { formatPrice } from '../../utils/formatPrice';
 
 const CartModal = () => {
-    const { isCartOpen, toggleCart, cartItems, removeFromCart, updateQuantity, getCartTotal, checkout, pointsBalance, setIsCartOpen } = useCart();
+    const { isCartOpen, toggleCart, cartItems, removeFromCart, updateQuantity, cartTotal: total, checkout, pointsBalance, setIsCartOpen } = useCart();
     const { isAuthenticated } = useAuth();
     const [usePoints, setUsePoints] = useState(0);
     const location = useLocation();
@@ -21,7 +20,6 @@ const CartModal = () => {
 
     if (!isCartOpen) return null;
 
-    const total = getCartTotal();
     const maxPointsToUse = isAuthenticated ? Math.min(pointsBalance, Math.floor(total * 10)) : 0; // 10 points = $1 discount
 
     const handleCheckout = () => {

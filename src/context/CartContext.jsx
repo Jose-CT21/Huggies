@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useMemo } from 'react';
 import { useAuth } from './AuthContext';
 
 const CartContext = createContext();
@@ -22,8 +22,23 @@ export const CartProvider = ({ children }) => {
     // Simple persistence (in a real app this would be in a DB)
     useEffect(() => {
         localStorage.setItem('huggies_cart', JSON.stringify(cartItems));
+    }, [cartItems]);
+
+    useEffect(() => {
         localStorage.setItem('huggies_points', pointsBalance.toString());
-    }, [cartItems, pointsBalance]);
+    }, [pointsBalance]);
+
+    const cartItemsCount = useMemo(
+        () => cartItems.reduce((acc, item) => acc + item.quantity, 0),
+        [cartItems]
+    );
+
+    const cartTotal = useMemo(() => {
+        return cartItems.reduce((total, item) => {
+            const price = item.discountPrice || item.price;
+            return total + (price * item.quantity);
+        }, 0);
+    }, [cartItems]);
 
     const addToCart = (product) => {
         setCartItems(prev => {
@@ -42,6 +57,10 @@ export const CartProvider = ({ children }) => {
         setCartItems(prev => prev.filter(item => item.id !== id));
     };
 
+    const clearCart = () => {
+        setCartItems([]);
+    };
+
     const updateQuantity = (id, newQuantity) => {
         if (newQuantity < 1) {
             removeFromCart(id);
@@ -52,17 +71,12 @@ export const CartProvider = ({ children }) => {
         ));
     };
 
-    const getCartTotal = () => {
-        return cartItems.reduce((total, item) => {
-            const price = item.discountPrice || item.price;
-            return total + (price * item.quantity);
-        }, 0);
-    };
+    const getCartTotal = () => cartTotal;
 
     const toggleCart = () => setIsCartOpen(!isCartOpen);
 
     const checkout = (pointsToRedeem = 0) => {
-        const total = getCartTotal();
+        const total = cartTotal;
         
         // Calculate point discount (10 points = $1)
         const discountAmount = pointsToRedeem / 10;
@@ -95,11 +109,14 @@ export const CartProvider = ({ children }) => {
     return (
         <CartContext.Provider value={{
             cartItems,
+            cartItemsCount,
+            cartTotal,
             pointsBalance,
             isCartOpen,
             setIsCartOpen,
             addToCart,
             removeFromCart,
+            clearCart,
             updateQuantity,
             getCartTotal,
             toggleCart,

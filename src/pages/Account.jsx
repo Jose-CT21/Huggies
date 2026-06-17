@@ -4,14 +4,14 @@ import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import Button from '../components/ui/Button';
 import './Account.css';
+import { formatPrice } from '../utils/formatPrice';
+import { calculateAgeInMonths } from '../utils/calculateAge';
+import { getSkinTypeLabel } from '../utils/labels';
 
 const Account = () => {
     const { isAuthenticated, user, logout, childData, updateChildData } = useAuth();
-    const { cartItems, getCartTotal, toggleCart, pointsBalance } = useCart();
+    const { cartItemsCount, cartTotal, toggleCart, pointsBalance } = useCart();
     const navigate = useNavigate();
-    
-    const cartItemsCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
-    const cartTotal = getCartTotal();
 
     // Determine rewards level
     let level = 'Bronce';
@@ -52,19 +52,7 @@ const Account = () => {
     const handleSave = (e) => {
         e.preventDefault();
         
-        // Calculate age in months
-        let ageInMonths = null;
-        if (editBirthDate) {
-            const birth = new Date(editBirthDate);
-            const now = new Date();
-            const diffYears = now.getFullYear() - birth.getFullYear();
-            const diffMonths = now.getMonth() - birth.getMonth();
-            let totalMonths = diffYears * 12 + diffMonths;
-            if (now.getDate() < birth.getDate()) {
-                totalMonths--;
-            }
-            ageInMonths = totalMonths;
-        }
+        const ageInMonths = calculateAgeInMonths(editBirthDate);
 
         updateChildData({
             name: editName.trim() || 'mi bebé',
@@ -83,14 +71,6 @@ const Account = () => {
         // Trigger onboarding modal
         updateChildData(null);
         navigate('/');
-    };
-
-    const getSkinTypeLabel = (type) => {
-        switch(type) {
-            case 'sensitive': return 'Sensible';
-            case 'atopic': return 'Muy Sensible / Atópica';
-            default: return 'Normal';
-        }
     };
 
     return (
@@ -226,7 +206,7 @@ const Account = () => {
                                     </div>
                                     <div className="stat-box">
                                         <span className="stat-label">Subtotal</span>
-                                        <span className="stat-value">₡{cartTotal.toLocaleString('es-CR')}</span>
+                                        <span className="stat-value">{formatPrice(cartTotal)}</span>
                                     </div>
                                 </div>
                                 <Button variant="primary" size="small" onClick={toggleCart} className="w-full mt-md">
@@ -262,7 +242,7 @@ const Account = () => {
                                     <span className="order-item__status delivered">Entregado</span>
                                 </div>
                                 <p className="order-item__desc">2x Paquete Huggies Supreme Etapa 2</p>
-                                <p className="order-item__price">$850.00</p>
+                                <p className="order-item__price">{formatPrice(8500)}</p>
                             </div>
                             <div className="order-item">
                                 <div className="order-item__header">
@@ -270,7 +250,7 @@ const Account = () => {
                                     <span className="order-item__status delivered">Entregado</span>
                                 </div>
                                 <p className="order-item__desc">1x Toallitas Húmedas Cuidado Puro (4 paq)</p>
-                                <p className="order-item__price">$220.00</p>
+                                <p className="order-item__price">{formatPrice(2200)}</p>
                             </div>
                             <Button variant="outline" size="small" className="mt-md">Ver todos los pedidos</Button>
                         </div>

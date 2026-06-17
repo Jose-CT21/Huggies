@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import './ProductMarquee.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,36 +12,36 @@ const ProductMarquee = ({ title, products }) => {
     const [startX, setStartX] = useState(0);
     const [scrollLeft, setScrollLeft] = useState(0);
 
-    const handleMouseDown = (e) => {
+    const handleMouseDown = useCallback((e) => {
         setIsDragging(true);
         setHasDragged(false);
         setStartX(e.pageX - trackRef.current.offsetLeft);
         setScrollLeft(trackRef.current.scrollLeft);
-    };
+    }, []);
 
-    const handleMouseLeave = () => {
+    const handleMouseLeave = useCallback(() => {
         setIsDragging(false);
-    };
+    }, []);
 
-    const handleMouseUp = () => {
+    const handleMouseUp = useCallback(() => {
         setIsDragging(false);
-    };
+    }, []);
 
-    const handleMouseMove = (e) => {
+    const handleMouseMove = useCallback((e) => {
         if (!isDragging) return;
         e.preventDefault();
         setHasDragged(true);
         const x = e.pageX - trackRef.current.offsetLeft;
         const walk = (x - startX) * 2; // Scroll speed multiplier
         trackRef.current.scrollLeft = scrollLeft - walk;
-    };
+    }, [isDragging, startX, scrollLeft]);
 
-    const handleProductClick = (productId) => {
+    const handleProductClick = useCallback((productId) => {
         // Prevent click if the user was dragging
         if (!hasDragged) {
             navigate(`/product/${productId}`);
         }
-    };
+    }, [hasDragged, navigate]);
 
     return (
         <section className="product-marquee-section">

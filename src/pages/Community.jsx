@@ -1,25 +1,45 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { initialPosts, postCategories } from '../data/communityData';
 import { Heart, Baby, MessageCircle, Home, Lightbulb, HelpCircle, Star, HeartHandshake } from 'lucide-react';
 import './Community.css';
 
 /* ─────────────────────────────────────────────
    CREATE POST BOX
-───────────────────────────────────────────── */
+ ───────────────────────────────────────────── */
 const CreatePostBox = ({ onPost }) => {
     const [expanded, setExpanded] = useState(false);
     const [text, setText] = useState('');
     const [category, setCategory] = useState('');
     const [images, setImages] = useState([]);   // [{url, file}]
     const fileRef = useRef();
+    const createdUrlsRef = useRef([]);
+
+    useEffect(() => {
+        return () => {
+            createdUrlsRef.current.forEach(url => URL.revokeObjectURL(url));
+        };
+    }, []);
 
     const handleImagePick = (e) => {
         const files = Array.from(e.target.files);
-        const previews = files.map(f => ({ url: URL.createObjectURL(f), file: f }));
+        const previews = files.map(f => {
+            const url = URL.createObjectURL(f);
+            createdUrlsRef.current.push(url);
+            return { url, file: f };
+        });
         setImages(prev => [...prev, ...previews].slice(0, 4));
     };
 
-    const removeImage = (idx) => setImages(prev => prev.filter((_, i) => i !== idx));
+    const removeImage = (idx) => {
+        setImages(prev => {
+            const target = prev[idx];
+            if (target && target.url) {
+                URL.revokeObjectURL(target.url);
+                createdUrlsRef.current = createdUrlsRef.current.filter(u => u !== target.url);
+            }
+            return prev.filter((_, i) => i !== idx);
+        });
+    };
 
     const canPost = text.trim().length > 0 && category !== '';
 
@@ -151,7 +171,7 @@ const CommentsSection = () => {
         setComments(prev => [
             ...prev,
             {
-                id: Date.now(),
+                id: crypto.randomUUID(),
                 author: 'Tú (María Pérez)',
                 avatar: 'https://i.pravatar.cc/150?u=me',
                 text: text.trim(),

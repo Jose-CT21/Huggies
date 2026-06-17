@@ -3,16 +3,8 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { huggiesCatalog } from '../data/huggiesCatalog';
 import { useCart } from '../context/CartContext';
 import Button from '../components/ui/Button';
+import { formatPrice } from '../utils/formatPrice';
 import './ProductDetail.css';
-
-/**
- * Formatea un precio en colones costarricenses.
- * @param {number} amount - Monto a formatear
- * @returns {string} Precio formateado (e.g., "₡5,950")
- */
-const formatPrice = (amount) => {
-    return `₡${amount.toLocaleString('es-CR')}`;
-};
 
 const ProductDetail = () => {
     const { id } = useParams();

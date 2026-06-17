@@ -13,17 +13,14 @@ const Navbar = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { isAuthenticated, logout } = useAuth();
-    const { cartItems, pointsBalance, toggleCart } = useCart();
-
-    const cartItemsCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+    const { cartItemsCount, pointsBalance, toggleCart } = useCart();
 
     useEffect(() => {
         const handleScroll = () => {
-            if (window.scrollY > 20) {
-                setScrolled(true);
-            } else {
-                setScrolled(false);
-            }
+            setScrolled(prev => {
+                const shouldScroll = window.scrollY > 20;
+                return prev === shouldScroll ? prev : shouldScroll;
+            });
         };
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);

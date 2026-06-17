@@ -7,6 +7,7 @@ import CartModal from './components/ui/CartModal';
 import OnboardingWizard from './components/ui/OnboardingWizard';
 import AppTutorial from './components/ui/AppTutorial';
 import { ErrorBoundary } from 'react-error-boundary';
+import { useAuth } from './context/AuthContext';
 
 function ErrorFallback({ error }) {
   return (
@@ -49,13 +50,17 @@ const PageLoader = () => (
 function App() {
   const location = useLocation();
   const isHugsRoute = location.pathname === '/hugs';
+  const { childData, hasSeenTutorial } = useAuth();
+
+  const showOnboarding = !localStorage.getItem('huggies_onboarding_completed') && !childData;
+  const showTutorial = childData && !hasSeenTutorial;
 
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <div className="app-container">
         <Navbar />
-        <OnboardingWizard />
-        <AppTutorial />
+        {showOnboarding && <OnboardingWizard />}
+        {showTutorial && <AppTutorial />}
         <main className="main-content">
           <Suspense fallback={<PageLoader />}>
             <Routes>
