@@ -12,14 +12,14 @@ import { getRecommendedProducts } from '../../utils/recommendations';
 import './PersonalizedRecommendations.css';
 
 const PersonalizedRecommendations = () => {
-    const { childData, updateChildData } = useAuth();
+    const { childrenData, updateChildrenData, activeChildIndex, setActiveChildIndex } = useAuth();
     const { addToCart } = useCart();
     const [prevChildName, setPrevChildName] = useState(null);
     const [checkedMilestones, setCheckedMilestones] = useState({});
     const [feedback, setFeedback] = useState(null);
 
-    // Sync feedback and milestones states when child data changes, avoiding useEffect cascading renders
-    const childName = childData?.name || null;
+    const activeChild = childrenData && childrenData.length > 0 ? childrenData[activeChildIndex] : null;
+    const childName = activeChild?.name || null;
     if (childName !== prevChildName) {
         setPrevChildName(childName);
         
@@ -41,30 +41,30 @@ const PersonalizedRecommendations = () => {
     }
 
     const handleFeedback = (val) => {
-        if (!childData) return;
+        if (!activeChild) return;
         setFeedback(val);
-        localStorage.setItem(`huggies_feedback_landing_${childData.name}`, val);
+        localStorage.setItem(`huggies_feedback_landing_${activeChild.name}`, val);
     };
 
     const handleMilestoneChange = (milestoneText) => {
-        if (!childData) return;
+        if (!activeChild) return;
         const updated = {
             ...checkedMilestones,
             [milestoneText]: !checkedMilestones[milestoneText]
         };
         setCheckedMilestones(updated);
-        localStorage.setItem(`huggies_milestones_${childData.name}`, JSON.stringify(updated));
+        localStorage.setItem(`huggies_milestones_${activeChild.name}`, JSON.stringify(updated));
     };
 
     const handleRestartOnboarding = () => {
         // Clear child data to trigger the onboarding wizard again
-        updateChildData(null);
+        updateChildrenData([]);
     };
 
     const handleProductClick = (product) => showProductModal(product, addToCart);
 
     // If no onboarding data exists OR if onboarding was skipped, show invitation
-    if (!childData || childData.skipped) {
+    if (!activeChild || activeChild.skipped) {
         return (
             <section className="recommendations-promo container animate-slide-up">
                 <div className="promo-card">
@@ -84,18 +84,45 @@ const PersonalizedRecommendations = () => {
         );
     }
 
-    const { name, ageInMonths, diaperSize, skinType, interests } = childData;
+    const { name, ageInMonths, diaperSize, skinType, interests } = activeChild;
     const stage = getDevelopmentalStage(ageInMonths);
 
     if (!stage) return null;
 
     // Filter recommended products based on diaper size or skinType
-    const recommendedProducts = getRecommendedProducts(huggiesCatalog, childData, 3);
+    const recommendedProducts = getRecommendedProducts(huggiesCatalog, activeChild, 3);
 
     return (
         <section className="personalized-recommendations container animate-slide-up">
             <header className="rec-header">
                 <div className="rec-title-area">
+                    {childrenData.length > 1 && (
+                        <div className="baby-selector-container" style={{ marginBottom: '16px' }}>
+                            <p style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#555', marginBottom: '8px' }}>Ver recomendaciones para:</p>
+                            <div className="baby-selector" style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '8px' }}>
+                                {childrenData.map((child, idx) => (
+                                    <button 
+                                        key={idx}
+                                        onClick={() => setActiveChildIndex(idx)}
+                                        style={{
+                                            padding: '6px 14px',
+                                            borderRadius: '20px',
+                                            border: '1px solid #0288D1',
+                                            background: activeChildIndex === idx ? '#0288D1' : '#fff',
+                                            color: activeChildIndex === idx ? '#fff' : '#0288D1',
+                                            fontSize: '0.85rem',
+                                            cursor: 'pointer',
+                                            whiteSpace: 'nowrap',
+                                            fontWeight: activeChildIndex === idx ? 'bold' : 'normal',
+                                            textTransform: 'capitalize'
+                                        }}
+                                    >
+                                        {child.name}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                     <span className="rec-badge">Tu espacio personalizado</span>
                     <h2>El desarrollo de <strong>{name}</strong></h2>
                     <p className="rec-subtitle">

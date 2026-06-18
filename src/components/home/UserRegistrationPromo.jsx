@@ -23,7 +23,7 @@ const UserRegistrationPromo = () => {
                     </button>
                 </div>
             </div>
-            <div className="promo-badge">
+            <div className="promo-bg-icon">
                 <Star size={120} color="#ffffff" fill="#ffffff" strokeWidth={1} />
             </div>
         </div>

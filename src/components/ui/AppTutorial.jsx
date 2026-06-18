@@ -39,15 +39,15 @@ const TUTORIAL_STEPS = [
 ];
 
 const AppTutorial = () => {
-    const { childData, hasSeenTutorial, completeTutorial } = useAuth();
+    const { hasSeenTutorial, completeTutorial } = useAuth();
     const [step, setStep] = useState(0);
     const [isVisible, setIsVisible] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
 
     useEffect(() => {
-        // Show tutorial only if they completed onboarding but haven't seen tutorial
-        if (childData && !hasSeenTutorial) {
+        // Show tutorial if they haven't seen it
+        if (!hasSeenTutorial) {
             const timer = setTimeout(() => {
                 setIsVisible(true);
             }, 1000);
@@ -56,7 +56,7 @@ const AppTutorial = () => {
             const timer = setTimeout(() => setIsVisible(false), 0);
             return () => clearTimeout(timer);
         }
-    }, [childData, hasSeenTutorial]);
+    }, [hasSeenTutorial]);
 
     // Force navigation if they try to leave the tutorial path while it's active
     useEffect(() => {

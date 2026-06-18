@@ -9,7 +9,7 @@ import { calculateAgeInMonths } from '../utils/calculateAge';
 import { getSkinTypeLabel } from '../utils/labels';
 
 const Account = () => {
-    const { isAuthenticated, user, logout, childData, updateChildData } = useAuth();
+    const { isAuthenticated, user, logout, childrenData, updateChildrenData } = useAuth();
     const { cartItemsCount, cartTotal, toggleCart, pointsBalance } = useCart();
     const navigate = useNavigate();
 
@@ -20,11 +20,11 @@ const Account = () => {
     if (pointsBalance > 2000) level = 'Platino';
     
     // Edit state
-    const [isEditing, setIsEditing] = useState(false);
-    const [editName, setEditName] = useState(() => childData && !childData.skipped ? (childData.name || '') : '');
-    const [editBirthDate, setEditBirthDate] = useState(() => childData && !childData.skipped ? (childData.birthDate || '') : '');
-    const [editDiaperSize, setEditDiaperSize] = useState(() => childData && !childData.skipped ? (childData.diaperSize || 'M') : 'M');
-    const [editSkinType, setEditSkinType] = useState(() => childData && !childData.skipped ? (childData.skinType || 'normal') : 'normal');
+    const [editingChildIndex, setEditingChildIndex] = useState(null); // null, index, or 'new'
+    const [editName, setEditName] = useState('');
+    const [editBirthDate, setEditBirthDate] = useState('');
+    const [editDiaperSize, setEditDiaperSize] = useState('M');
+    const [editSkinType, setEditSkinType] = useState('normal');
 
     useEffect(() => {
         if (!isAuthenticated) {
@@ -32,14 +32,20 @@ const Account = () => {
         }
     }, [isAuthenticated, navigate]);
 
-    const handleStartEditing = () => {
-        if (childData && !childData.skipped) {
-            setEditName(childData.name || '');
-            setEditBirthDate(childData.birthDate || '');
-            setEditDiaperSize(childData.diaperSize || 'M');
-            setEditSkinType(childData.skinType || 'normal');
+    const handleStartEditing = (index) => {
+        if (index === 'new') {
+            setEditName('');
+            setEditBirthDate('');
+            setEditDiaperSize('M');
+            setEditSkinType('normal');
+        } else if (childrenData && childrenData[index]) {
+            const child = childrenData[index];
+            setEditName(child.name || '');
+            setEditBirthDate(child.birthDate || '');
+            setEditDiaperSize(child.diaperSize || 'M');
+            setEditSkinType(child.skinType || 'normal');
         }
-        setIsEditing(true);
+        setEditingChildIndex(index);
     };
 
     if (!isAuthenticated) return null;
@@ -49,28 +55,33 @@ const Account = () => {
         navigate('/');
     };
 
-    const handleSave = (e) => {
+    const handleSave = (e, index) => {
         e.preventDefault();
         
         const ageInMonths = calculateAgeInMonths(editBirthDate);
-
-        updateChildData({
+        const updatedChild = {
+            id: index === 'new' ? Date.now().toString() : (childrenData[index]?.id || Date.now().toString()),
             name: editName.trim() || 'mi bebé',
             birthDate: editBirthDate,
             ageInMonths,
             diaperSize: editDiaperSize,
             skinType: editSkinType,
-            skipped: false, // ensure skipped is false now that we filled it
+            skipped: false,
             lastUpdated: new Date().toISOString()
-        });
+        };
 
-        setIsEditing(false);
-    };
+        let newChildrenData = [...(childrenData || [])];
+        // If the only child was a "skipped" one, replace it
+        if (newChildrenData.length === 1 && newChildrenData[0].skipped) {
+            newChildrenData = [updatedChild];
+        } else if (index === 'new') {
+            newChildrenData.push(updatedChild);
+        } else {
+            newChildrenData[index] = { ...newChildrenData[index], ...updatedChild };
+        }
 
-    const handleStartOnboarding = () => {
-        // Trigger onboarding modal
-        updateChildData(null);
-        navigate('/');
+        updateChildrenData(newChildrenData);
+        setEditingChildIndex(null);
     };
 
     return (
@@ -90,106 +101,176 @@ const Account = () => {
                     
                     {/* Child Profile Section */}
                     <section className="account-card delay-100 animate-slide-up">
-                        <h2 className="account-card__title">Información del Bebé</h2>
+                        <h2 className="account-card__title">Información de tus Bebés</h2>
                         <div className="account-card__content">
-                            {isEditing ? (
-                                <form onSubmit={handleSave} className="account-edit-form">
-                                    <div className="form-group-account">
-                                        <label htmlFor="edit-name">Nombre del Bebé</label>
-                                        <input 
-                                            type="text" 
-                                            id="edit-name"
-                                            value={editName}
-                                            onChange={(e) => setEditName(e.target.value)}
-                                            placeholder="Ej. Mateo"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="form-group-account">
-                                        <label htmlFor="edit-birthdate">Fecha de Nacimiento</label>
-                                        <input 
-                                            type="date" 
-                                            id="edit-birthdate"
-                                            value={editBirthDate}
-                                            onChange={(e) => setEditBirthDate(e.target.value)}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="form-group-account">
-                                        <label htmlFor="edit-diaper">Talla de Pañal</label>
-                                        <select 
-                                            id="edit-diaper" 
-                                            value={editDiaperSize}
-                                            onChange={(e) => setEditDiaperSize(e.target.value)}
-                                        >
-                                            <option value="RN">RN (Recién Nacido - hasta 4 kg)</option>
-                                            <option value="P">P (Pequeño - 3 a 6 kg)</option>
-                                            <option value="M">M (Mediano - 5 a 9 kg)</option>
-                                            <option value="G">G (Grande - 9 a 13 kg)</option>
-                                            <option value="XG">XG (Extra Grande - 12 a 15 kg)</option>
-                                            <option value="XXG">XXG (Jumbo - más de 14 kg)</option>
-                                        </select>
-                                    </div>
-                                    <div className="form-group-account">
-                                        <label htmlFor="edit-skin">Tipo de Piel</label>
-                                        <select 
-                                            id="edit-skin" 
-                                            value={editSkinType}
-                                            onChange={(e) => setEditSkinType(e.target.value)}
-                                        >
-                                            <option value="normal">Normal</option>
-                                            <option value="sensitive">Sensible</option>
-                                            <option value="atopic">Muy Sensible / Atópica</option>
-                                        </select>
-                                    </div>
-                                    <div className="edit-form-buttons">
-                                        <Button variant="primary" size="small" type="submit">Guardar</Button>
-                                        <Button variant="outline" size="small" type="button" onClick={() => setIsEditing(false)}>Cancelar</Button>
-                                    </div>
-                                </form>
+                            {(!childrenData || childrenData.length === 0 || (childrenData.length === 1 && childrenData[0].skipped)) ? (
+                                <div className="no-child-data">
+                                    <p>No tienes información registrada para personalizar tus recomendaciones.</p>
+                                    <Button variant="primary" size="small" onClick={() => handleStartEditing('new')} className="mt-md">
+                                        Registrar Bebé
+                                    </Button>
+                                </div>
                             ) : (
-                                <>
-                                    {(!childData || childData.skipped) ? (
-                                        <div className="no-child-data">
-                                            <p>No tienes información registrada del bebé para personalizar tus recomendaciones.</p>
-                                            <Button variant="primary" size="small" onClick={handleStartOnboarding} className="mt-md">
-                                                Registrar Bebé
-                                            </Button>
-                                        </div>
+                                <div className="children-list">
+                                    {childrenData.map((child, index) => {
+                                        if (child.skipped) return null;
+                                        return (
+                                            <div key={child.id || index} className="child-profile-item" style={{ marginBottom: '24px', paddingBottom: '24px', borderBottom: '1px solid #eee' }}>
+                                                {editingChildIndex === index ? (
+                                                    <form onSubmit={(e) => handleSave(e, index)} className="account-edit-form">
+                                                        <div className="form-group-account">
+                                                            <label htmlFor={`edit-name-${index}`}>Nombre del Bebé</label>
+                                                            <input 
+                                                                type="text" 
+                                                                id={`edit-name-${index}`}
+                                                                value={editName}
+                                                                onChange={(e) => setEditName(e.target.value)}
+                                                                placeholder="Ej. Mateo"
+                                                                required
+                                                            />
+                                                        </div>
+                                                        <div className="form-group-account">
+                                                            <label htmlFor={`edit-birthdate-${index}`}>Fecha de Nacimiento</label>
+                                                            <input 
+                                                                type="date" 
+                                                                id={`edit-birthdate-${index}`}
+                                                                value={editBirthDate}
+                                                                onChange={(e) => setEditBirthDate(e.target.value)}
+                                                                required
+                                                            />
+                                                        </div>
+                                                        <div className="form-group-account">
+                                                            <label htmlFor={`edit-diaper-${index}`}>Talla de Pañal</label>
+                                                            <select 
+                                                                id={`edit-diaper-${index}`}
+                                                                value={editDiaperSize}
+                                                                onChange={(e) => setEditDiaperSize(e.target.value)}
+                                                            >
+                                                                <option value="RN">RN (Recién Nacido - hasta 4 kg)</option>
+                                                                <option value="P">P (Pequeño - 3 a 6 kg)</option>
+                                                                <option value="M">M (Mediano - 5 a 9 kg)</option>
+                                                                <option value="G">G (Grande - 9 a 13 kg)</option>
+                                                                <option value="XG">XG (Extra Grande - 12 a 15 kg)</option>
+                                                                <option value="XXG">XXG (Jumbo - más de 14 kg)</option>
+                                                            </select>
+                                                        </div>
+                                                        <div className="form-group-account">
+                                                            <label htmlFor={`edit-skin-${index}`}>Tipo de Piel</label>
+                                                            <select 
+                                                                id={`edit-skin-${index}`}
+                                                                value={editSkinType}
+                                                                onChange={(e) => setEditSkinType(e.target.value)}
+                                                            >
+                                                                <option value="normal">Normal</option>
+                                                                <option value="sensitive">Sensible</option>
+                                                                <option value="atopic">Muy Sensible / Atópica</option>
+                                                            </select>
+                                                        </div>
+                                                        <div className="edit-form-buttons">
+                                                            <Button variant="primary" size="small" type="submit">Guardar</Button>
+                                                            <Button variant="outline" size="small" type="button" onClick={() => setEditingChildIndex(null)}>Cancelar</Button>
+                                                        </div>
+                                                    </form>
+                                                ) : (
+                                                    <>
+                                                        <div className="info-row">
+                                                            <span>Nombre</span>
+                                                            <strong>{child.name}</strong>
+                                                        </div>
+                                                        <div className="info-row">
+                                                            <span>Fecha de nacimiento</span>
+                                                            <strong>{child.birthDate}</strong>
+                                                        </div>
+                                                        <div className="info-row">
+                                                            <span>Edad</span>
+                                                            <strong>
+                                                                {child.ageInMonths !== null && (
+                                                                    child.ageInMonths < 0 
+                                                                        ? 'En camino (Gestación)' 
+                                                                        : `${child.ageInMonths} ${child.ageInMonths === 1 ? 'mes' : 'meses'}`
+                                                                )}
+                                                            </strong>
+                                                        </div>
+                                                        <div className="info-row">
+                                                            <span>Talla actual</span>
+                                                            <strong>Etapa {child.diaperSize}</strong>
+                                                        </div>
+                                                        <div className="info-row">
+                                                            <span>Sensibilidad de Piel</span>
+                                                            <strong>{getSkinTypeLabel(child.skinType)}</strong>
+                                                        </div>
+                                                        <Button variant="outline" size="small" className="mt-md" onClick={() => handleStartEditing(index)}>
+                                                            Editar Información
+                                                        </Button>
+                                                    </>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+
+                                    {/* Add New Baby Form inline if requested */}
+                                    {editingChildIndex === 'new' ? (
+                                        <form onSubmit={(e) => handleSave(e, 'new')} className="account-edit-form new-baby-form">
+                                            <h3 style={{ marginBottom: '16px', fontSize: '1rem', color: '#0288D1' }}>Agregar un Bebé</h3>
+                                            <div className="form-group-account">
+                                                <label htmlFor="edit-name-new">Nombre del Bebé</label>
+                                                <input 
+                                                    type="text" 
+                                                    id="edit-name-new"
+                                                    value={editName}
+                                                    onChange={(e) => setEditName(e.target.value)}
+                                                    placeholder="Ej. Mateo"
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="form-group-account">
+                                                <label htmlFor="edit-birthdate-new">Fecha de Nacimiento</label>
+                                                <input 
+                                                    type="date" 
+                                                    id="edit-birthdate-new"
+                                                    value={editBirthDate}
+                                                    onChange={(e) => setEditBirthDate(e.target.value)}
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="form-group-account">
+                                                <label htmlFor="edit-diaper-new">Talla de Pañal</label>
+                                                <select 
+                                                    id="edit-diaper-new"
+                                                    value={editDiaperSize}
+                                                    onChange={(e) => setEditDiaperSize(e.target.value)}
+                                                >
+                                                    <option value="RN">RN (Recién Nacido - hasta 4 kg)</option>
+                                                    <option value="P">P (Pequeño - 3 a 6 kg)</option>
+                                                    <option value="M">M (Mediano - 5 a 9 kg)</option>
+                                                    <option value="G">G (Grande - 9 a 13 kg)</option>
+                                                    <option value="XG">XG (Extra Grande - 12 a 15 kg)</option>
+                                                    <option value="XXG">XXG (Jumbo - más de 14 kg)</option>
+                                                </select>
+                                            </div>
+                                            <div className="form-group-account">
+                                                <label htmlFor="edit-skin-new">Tipo de Piel</label>
+                                                <select 
+                                                    id="edit-skin-new"
+                                                    value={editSkinType}
+                                                    onChange={(e) => setEditSkinType(e.target.value)}
+                                                >
+                                                    <option value="normal">Normal</option>
+                                                    <option value="sensitive">Sensible</option>
+                                                    <option value="atopic">Muy Sensible / Atópica</option>
+                                                </select>
+                                            </div>
+                                            <div className="edit-form-buttons">
+                                                <Button variant="primary" size="small" type="submit">Guardar</Button>
+                                                <Button variant="outline" size="small" type="button" onClick={() => setEditingChildIndex(null)}>Cancelar</Button>
+                                            </div>
+                                        </form>
                                     ) : (
-                                        <>
-                                            <div className="info-row">
-                                                <span>Nombre</span>
-                                                <strong>{childData.name}</strong>
-                                            </div>
-                                            <div className="info-row">
-                                                <span>Fecha de nacimiento</span>
-                                                <strong>{childData.birthDate}</strong>
-                                            </div>
-                                            <div className="info-row">
-                                                <span>Edad</span>
-                                                <strong>
-                                                    {childData.ageInMonths !== null && (
-                                                        childData.ageInMonths < 0 
-                                                            ? 'En camino (Gestación)' 
-                                                            : `${childData.ageInMonths} ${childData.ageInMonths === 1 ? 'mes' : 'meses'}`
-                                                    )}
-                                                </strong>
-                                            </div>
-                                            <div className="info-row">
-                                                <span>Talla actual</span>
-                                                <strong>Etapa {childData.diaperSize}</strong>
-                                            </div>
-                                            <div className="info-row">
-                                                <span>Sensibilidad de Piel</span>
-                                                <strong>{getSkinTypeLabel(childData.skinType)}</strong>
-                                            </div>
-                                            <Button variant="outline" size="small" className="mt-md" onClick={handleStartEditing}>
-                                                Editar Información
-                                            </Button>
-                                        </>
+                                        <Button variant="outline" size="small" onClick={() => handleStartEditing('new')} className="w-full" style={{ borderStyle: 'dashed' }}>
+                                            + Añadir otro bebé
+                                        </Button>
                                     )}
-                                </>
+                                </div>
                             )}
                         </div>
                     </section>

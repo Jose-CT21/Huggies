@@ -14,10 +14,12 @@ import { showProductModal } from '../utils/productModal';
 import './Products.css';
 
 const Products = () => {
-    const { childData, updateChildData, isAuthenticated } = useAuth();
+    const { childrenData, updateChildrenData, activeChildIndex, setActiveChildIndex, isAuthenticated } = useAuth();
     const { addToCart, toggleCart, cartItemsCount } = useCart();
 
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    
+    const activeChild = childrenData && childrenData.length > 0 ? childrenData[activeChildIndex] : null;
 
     const {
         filters,
@@ -28,13 +30,13 @@ const Products = () => {
         products,
         recommendedProducts,
         handleFilterChange
-    } = useProductFilters(childData);
+    } = useProductFilters(activeChild);
 
     const [prevChildName, setPrevChildName] = useState(null);
     const [feedbackProducts, setFeedbackProducts] = useState(null);
 
     // Adjust state during render if child name changes to avoid useEffect cascading renders
-    const childName = childData?.name || null;
+    const childName = activeChild?.name || null;
     if (childName !== prevChildName) {
         setPrevChildName(childName);
         const stored = childName ? localStorage.getItem(`huggies_feedback_products_${childName}`) : null;
@@ -42,9 +44,9 @@ const Products = () => {
     }
 
     const handleFeedbackProducts = (val) => {
-        if (!childData) return;
+        if (!activeChild) return;
         setFeedbackProducts(val);
-        localStorage.setItem(`huggies_feedback_products_${childData.name}`, val);
+        localStorage.setItem(`huggies_feedback_products_${activeChild.name}`, val);
         Swal.fire({
             title: '¡Gracias por tu opinión!',
             text: 'Nos ayuda a mejorar las recomendaciones.',
@@ -106,11 +108,39 @@ const Products = () => {
                                 <div className="rec-section-header">
                                     <div className="rec-section-title-area">
                                         <span className="rec-section-badge">Recomendados para ti</span>
-                                        <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            Productos sugeridos para <strong>{childData.name}</strong> 
+                                        <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                                            Productos sugeridos para <strong>{activeChild.name}</strong> 
                                             <Baby size={28} color="#ea580c" />
                                         </h2>
-                                        <p>Basado en su talla (<strong>{childData.diaperSize}</strong>) y su piel (<strong>{getSkinTypeLabel(childData.skinType)}</strong>)</p>
+                                        <p>Basado en su talla (<strong>{activeChild.diaperSize}</strong>) y su piel (<strong>{getSkinTypeLabel(activeChild.skinType)}</strong>)</p>
+                                        
+                                        {childrenData && childrenData.length > 1 && (
+                                            <div className="baby-selector-container" style={{ marginTop: '16px', marginBottom: '8px' }}>
+                                                <p style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#555', marginBottom: '8px' }}>Ver recomendaciones para:</p>
+                                                <div className="baby-selector" style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '8px' }}>
+                                                    {childrenData.map((child, idx) => (
+                                                        <button 
+                                                            key={idx}
+                                                            onClick={() => setActiveChildIndex(idx)}
+                                                            style={{
+                                                                padding: '6px 14px',
+                                                                borderRadius: '20px',
+                                                                border: '1px solid #0288D1',
+                                                                background: activeChildIndex === idx ? '#0288D1' : '#fff',
+                                                                color: activeChildIndex === idx ? '#fff' : '#0288D1',
+                                                                fontSize: '0.85rem',
+                                                                cursor: 'pointer',
+                                                                whiteSpace: 'nowrap',
+                                                                fontWeight: activeChildIndex === idx ? 'bold' : 'normal',
+                                                                textTransform: 'capitalize'
+                                                            }}
+                                                        >
+                                                            {child.name}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="recommended-products-grid">
@@ -165,7 +195,7 @@ const Products = () => {
                                 <div className="recommended-feedback-container">
                                     {feedbackProducts ? (
                                         <div className="recommended-feedback-submitted">
-                                            <span>✨ ¡Gracias! Tu opinión nos ayuda a perfeccionar las sugerencias para {childData.name}. ❤️</span>
+                                            <span>✨ ¡Gracias! Tu opinión nos ayuda a perfeccionar las sugerencias para {activeChild.name}. ❤️</span>
                                         </div>
                                     ) : (
                                         <div className="recommended-feedback-prompt">
@@ -185,14 +215,14 @@ const Products = () => {
                         )}
 
                         {/* 2. Promo banner for guest users */}
-                        {(!childData || childData.skipped) && (
+                        {(!activeChild || activeChild.skipped) && (
                             <div className="recommended-products-promo animate-slide-up">
                                 <div className="promo-text">
                                     <span className="promo-badge">Personaliza tu compra</span>
                                     <h3>¿Quieres ver productos sugeridos para tu bebé?</h3>
                                     <p>Cuéntanos un poco sobre su etapa y talla para destacar los productos ideales para su piel.</p>
                                 </div>
-                                <Button variant="primary" size="small" onClick={() => { updateChildData(null); navigate('/'); }}>
+                                <Button variant="primary" size="small" onClick={() => { updateChildrenData([]); navigate('/'); }}>
                                     Registrar mi bebé
                                 </Button>
                             </div>

@@ -3,20 +3,23 @@ import { useAuth } from '../../context/AuthContext';
 import Button from './Button';
 import './OnboardingWizard.css';
 import CustomDatePicker from './CustomDatePicker';
-import { Sparkles, Baby, Smile, Heart, Calendar, Shield, Puzzle } from 'lucide-react';
+import { Sparkles, Baby, Smile, Heart, Calendar, Shield, Puzzle, Plus } from 'lucide-react';
 
 import { DIAPER_SIZES, INTERESTS, SKIN_TYPES } from '../../data/onboardingData';
 
 const OnboardingWizard = () => {
-    const { childData, updateChildData } = useAuth();
-    const [prevChildData, setPrevChildData] = useState(childData);
+    const { childrenData, updateChildrenData } = useAuth();
+    const [prevChildrenData, setPrevChildrenData] = useState(childrenData);
     const [showWizard, setShowWizard] = useState(() => {
         const completed = localStorage.getItem('huggies_onboarding_completed');
-        return !completed && !childData;
+        return !completed && (!childrenData || childrenData.length === 0);
     });
     const [step, setStep] = useState(1);
     
-    // Form state
+    // Array of all babies registered during this onboarding session
+    const [pendingChildren, setPendingChildren] = useState([]);
+    
+    // Form state for current baby
     const [name, setName] = useState('');
     const [gender, setGender] = useState('');
     const [birthDate, setBirthDate] = useState('');
@@ -24,16 +27,15 @@ const OnboardingWizard = () => {
     const [skinType, setSkinType] = useState('');
     const [selectedInterests, setSelectedInterests] = useState([]);
 
-    // Constants for birth date ranges (dynamic based on Today)
-
-    // Adjust state during render when childData changes (e.g. on reset/restart onboarding)
-    if (childData !== prevChildData) {
-        setPrevChildData(childData);
-        if (!childData) {
+    // Adjust state during render when childrenData changes
+    if (childrenData !== prevChildrenData) {
+        setPrevChildrenData(childrenData);
+        if (!childrenData || childrenData.length === 0) {
             const completed = localStorage.getItem('huggies_onboarding_completed');
             if (!completed) {
                 setShowWizard(true);
-                setStep(1); // Reset wizard step too
+                setStep(1);
+                setPendingChildren([]);
             }
         } else {
             setShowWizard(false);
@@ -74,52 +76,82 @@ const OnboardingWizard = () => {
             alert('Por favor selecciona al menos un área de interés para personalizar tus consejos.');
             return;
         }
+        
+        if (step === 4) {
+            // Save current baby to pending array
+            const babyAgeInMonths = calculateAgeInMonths(birthDate);
+            const newChild = {
+                id: Date.now().toString(),
+                name: name.trim() || `Bebé ${pendingChildren.length + 1}`,
+                gender,
+                birthDate,
+                ageInMonths: babyAgeInMonths,
+                diaperSize,
+                skinType,
+                interests: selectedInterests,
+                lastUpdated: new Date().toISOString()
+            };
+            setPendingChildren([...pendingChildren, newChild]);
+        }
+        
         setStep(prev => prev + 1);
     };
 
     const handleBack = () => {
+        if (step === 5) {
+            // If going back from summary, pop the last baby
+            const poppedChildren = [...pendingChildren];
+            const lastChild = poppedChildren.pop();
+            setPendingChildren(poppedChildren);
+            // restore form state roughly
+            setName(lastChild.name.startsWith('Bebé') ? '' : lastChild.name);
+            setGender(lastChild.gender);
+            setBirthDate(lastChild.birthDate);
+            setDiaperSize(lastChild.diaperSize);
+            setSkinType(lastChild.skinType);
+            setSelectedInterests(lastChild.interests);
+        }
         setStep(prev => prev - 1);
     };
 
-    const handleSubmit = () => {
-        const babyAgeInMonths = calculateAgeInMonths(birthDate);
-        
-        const finalData = {
-            name: name.trim() || 'mi bebé',
-            gender,
-            birthDate,
-            ageInMonths: babyAgeInMonths,
-            diaperSize,
-            skinType,
-            interests: selectedInterests,
-            lastUpdated: new Date().toISOString()
-        };
+    const handleAddAnotherBaby = () => {
+        // Reset form state for a new baby
+        setName('');
+        setGender('');
+        setBirthDate('');
+        setDiaperSize('');
+        setSkinType('');
+        setSelectedInterests([]);
+        setStep(1); // Go back to step 1
+    };
 
-        updateChildData(finalData);
+    const handleSubmit = () => {
+        updateChildrenData(pendingChildren);
         setShowWizard(false);
     };
 
     const handleSkip = () => {
         // Save dummy/empty configuration to indicate skipped onboarding
-        const finalData = {
+        const finalData = [{
+            id: Date.now().toString(),
             name: 'tu bebé',
             gender: '',
             birthDate: '',
             ageInMonths: null,
-            diaperSize: 'M', // default size
+            diaperSize: 'M',
             skinType: 'normal',
             interests: ['sleep', 'milestones'],
             skipped: true,
             lastUpdated: new Date().toISOString()
-        };
-        updateChildData(finalData);
+        }];
+        updateChildrenData(finalData);
         setShowWizard(false);
     };
 
     if (!showWizard) return null;
 
     const babyMonths = calculateAgeInMonths(birthDate);
-    const progressPercent = (step / 5) * 100;
+    const progressPercent = step === 5 ? 100 : (step / 5) * 100;
 
     return (
         <div className="onboarding-overlay">
@@ -138,7 +170,11 @@ const OnboardingWizard = () => {
                             <h2 className="wizard-title" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                                 ¡Te damos la bienvenida a Huggies! <Baby size={28} color="#0ea5e9" />
                             </h2>
-                            <p className="wizard-subtitle">Para darte una experiencia personalizada con artículos y recomendaciones, cuéntanos sobre tu bebé.</p>
+                            <p className="wizard-subtitle">
+                                {pendingChildren.length > 0 
+                                    ? "Vamos a agregar la información de tu otro bebé." 
+                                    : "Para darte una experiencia personalizada con artículos y recomendaciones, cuéntanos sobre tu bebé."}
+                            </p>
                             
                             <div className="form-group-wizard">
                                 <label className="wizard-label">¿Cómo se llama tu bebé? (Opcional)</label>
@@ -283,38 +319,46 @@ const OnboardingWizard = () => {
                     {step === 5 && (
                         <div className="wizard-step wizard-success animate-fade-in">
                             <div className="success-lottie-placeholder">🎉</div>
-                            <h2 className="wizard-title">¡Todo listo para la aventura, {name || 'mamá/papá'}!</h2>
+                            <h2 className="wizard-title">¡Todo listo para la aventura, mamá/papá!</h2>
                             <p className="wizard-subtitle">
-                                Hemos guardado de forma segura tus preferencias. Ahora verás artículos y productos especialmente recomendados para el crecimiento de tu bebé.
+                                Hemos guardado de forma segura tus preferencias. Ahora verás artículos y productos especialmente recomendados.
                             </p>
 
                             <div className="wizard-summary-card">
-                                <h3>Resumen del Perfil</h3>
+                                <h3>Bebés Registrados</h3>
                                 <div className="summary-details">
-                                    <div className="summary-item">
-                                        <span>Bebé:</span>
-                                        <strong>{name || 'Mi bebé'} {gender === 'boy' ? '👦' : gender === 'girl' ? '👧' : ''}</strong>
-                                    </div>
-                                    {babyMonths !== null && (
-                                        <div className="summary-item">
-                                            <span>Etapa:</span>
-                                            <strong>
-                                                {babyMonths < 0 
-                                                    ? 'En camino / Gestación' 
-                                                    : `${babyMonths} ${babyMonths === 1 ? 'mes' : 'meses'}`
-                                                }
-                                            </strong>
+                                    {pendingChildren.map((child, idx) => (
+                                        <div key={idx} style={{ marginBottom: '16px', paddingBottom: '16px', borderBottom: idx < pendingChildren.length - 1 ? '1px solid #eee' : 'none' }}>
+                                            <div className="summary-item">
+                                                <span>Bebé:</span>
+                                                <strong>{child.name} {child.gender === 'boy' ? '👦' : child.gender === 'girl' ? '👧' : ''}</strong>
+                                            </div>
+                                            {child.ageInMonths !== null && (
+                                                <div className="summary-item">
+                                                    <span>Etapa:</span>
+                                                    <strong>
+                                                        {child.ageInMonths < 0 
+                                                            ? 'En camino / Gestación' 
+                                                            : `${child.ageInMonths} ${child.ageInMonths === 1 ? 'mes' : 'meses'}`
+                                                        }
+                                                    </strong>
+                                                </div>
+                                            )}
+                                            <div className="summary-item">
+                                                <span>Talla Recomendada:</span>
+                                                <strong>Etapa {child.diaperSize}</strong>
+                                            </div>
                                         </div>
-                                    )}
-                                    <div className="summary-item">
-                                        <span>Talla Recomendada:</span>
-                                        <strong>Etapa {diaperSize}</strong>
-                                    </div>
-                                    <div className="summary-item">
-                                        <span>Piel:</span>
-                                        <strong>{SKIN_TYPES.find(s => s.id === skinType)?.label}</strong>
-                                    </div>
+                                    ))}
                                 </div>
+                                <Button 
+                                    variant="outline" 
+                                    onClick={handleAddAnotherBaby} 
+                                    className="w-full mt-md"
+                                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                                >
+                                    <Plus size={18} /> Añadir otro bebé
+                                </Button>
                             </div>
                         </div>
                     )}
@@ -323,7 +367,7 @@ const OnboardingWizard = () => {
 
                 {/* Footer Buttons */}
                 <div className="onboarding-footer">
-                    {step > 1 && step < 5 && (
+                    {step > 1 && step <= 5 && (
                         <Button variant="outline" onClick={handleBack}>Atrás</Button>
                     )}
                     {step < 5 ? (
@@ -341,7 +385,7 @@ const OnboardingWizard = () => {
                         </Button>
                     ) : (
                         <Button variant="primary" onClick={handleSubmit} className="wizard-submit-btn w-full">
-                            Ver Recomendaciones Personalizadas
+                            Ver Recomendaciones
                         </Button>
                     )}
                 </div>

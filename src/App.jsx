@@ -50,10 +50,10 @@ const PageLoader = () => (
 function App() {
   const location = useLocation();
   const isHugsRoute = location.pathname === '/hugs';
-  const { childData, hasSeenTutorial } = useAuth();
+  const { childrenData, hasSeenTutorial } = useAuth();
 
-  const showOnboarding = !localStorage.getItem('huggies_onboarding_completed') && !childData;
-  const showTutorial = childData && !hasSeenTutorial;
+  const showTutorial = !hasSeenTutorial;
+  const showOnboarding = hasSeenTutorial && !localStorage.getItem('huggies_onboarding_completed') && (!childrenData || childrenData.length === 0);
 
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>

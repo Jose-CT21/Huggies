@@ -59,7 +59,12 @@ huggies-web/
     │   └── useProductFilters.js  # Lógica de filtrado de productos
     │
     ├── utils/                    # 🛠️ Utilidades y Servicios
-    │   └── aiChatService.js      # Servicio del asistente virtual de IA
+    │   ├── aiChatService.js      # Servicio del asistente virtual de IA
+    │   ├── calculateAge.js       # Cálculo de edad del bebé
+    │   ├── formatPrice.js        # Formateo de precios en colones
+    │   ├── labels.js             # Etiquetas genéricas
+    │   ├── productModal.js       # Utilidades para modales de producto
+    │   └── recommendations.js    # Lógica de recomendaciones
     │
     ├── components/               # 🧩 Componentes Reutilizables
     │   ├── ProductSidebar.jsx    # Barra lateral de filtros para el catálogo
@@ -73,7 +78,8 @@ huggies-web/
     │   │   ├── RewardsPromo.jsx / .css
     │   │   ├── ArticleCarousel.jsx / .css
     │   │   ├── ProductMarquee.jsx / .css              # Carrusel de productos en movimiento
-    │   │   └── UserRegistrationPromo.jsx / .css
+    │   │   ├── UserRegistrationPromo.jsx / .css
+    │   │   └── SupportNewsletterPromo.jsx / .css      # Promoción de newsletter y soporte
     │   │
     │   ├── layout/               # Componentes estructurales persistentes
     │   │   ├── Navbar.jsx / .css

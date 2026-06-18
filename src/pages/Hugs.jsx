@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
+import { useAuth } from '../context/AuthContext';
 import HugCard from '../components/hugs/HugCard';
 import { hugsVideos } from '../data/hugsData';
 import './Hugs.css';
@@ -12,6 +13,7 @@ import './Hugs.css';
 const MySwal = withReactContent(Swal);
 
 const Hugs = () => {
+    const { hasSeenTutorial } = useAuth();
     const [activeIndex, setActiveIndex] = useState(0);
     const containerRef = useRef(null);
     const isScrolling = useRef(false);
@@ -34,7 +36,7 @@ const Hugs = () => {
     // Show disclaimer on first visit
     useEffect(() => {
         const hasSeenDisclaimer = localStorage.getItem('huggies_hugs_disclaimer_seen');
-        if (!hasSeenDisclaimer) {
+        if (!hasSeenDisclaimer && hasSeenTutorial) {
             MySwal.fire({
                 title: 'Aviso Importante de Seguridad',
                 html: `

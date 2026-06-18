@@ -6,16 +6,17 @@ import { getDevelopmentalStage } from '../../data/developmentalStages';
 import { Baby, Smile, Heart, Lightbulb } from 'lucide-react';
 
 const BabyDashboard = () => {
-    const { childData, updateChildData } = useAuth();
+    const { childrenData, updateChildrenData, activeChildIndex, setActiveChildIndex } = useAuth();
 
-    if (!childData) return null; // Shouldn't render if completely empty, although skipping creates skipped:true childData
+    if (!childrenData || childrenData.length === 0) return null;
 
     const handleRegisterClick = () => {
-        // Clearing childData forces the OnboardingWizard to pop up again
-        updateChildData(null);
+        updateChildrenData([]);
     };
 
-    if (childData.skipped) {
+    const activeChild = childrenData[activeChildIndex];
+
+    if (activeChild.skipped) {
         return (
             <div className="baby-dashboard skipped-dashboard">
                 <div className="skipped-icon">
@@ -32,18 +33,45 @@ const BabyDashboard = () => {
         );
     }
 
-    // Find the right milestone
-    const age = childData.ageInMonths;
+    const age = activeChild.ageInMonths;
     const currentStage = getDevelopmentalStage(age) || getDevelopmentalStage(0);
 
     return (
         <div className="baby-dashboard active-dashboard">
+            {childrenData.length > 1 && (
+                <div className="baby-selector-container" style={{ marginBottom: '16px' }}>
+                    <p style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#555', marginBottom: '8px' }}>Ver recomendaciones para:</p>
+                    <div className="baby-selector" style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '8px' }}>
+                        {childrenData.map((child, idx) => (
+                            <button 
+                                key={idx}
+                                onClick={() => setActiveChildIndex(idx)}
+                                style={{
+                                    padding: '6px 14px',
+                                    borderRadius: '20px',
+                                    border: '1px solid #0288D1',
+                                    background: activeChildIndex === idx ? '#0288D1' : '#fff',
+                                    color: activeChildIndex === idx ? '#fff' : '#0288D1',
+                                    fontSize: '0.85rem',
+                                    cursor: 'pointer',
+                                    whiteSpace: 'nowrap',
+                                    fontWeight: activeChildIndex === idx ? 'bold' : 'normal',
+                                    textTransform: 'capitalize'
+                                }}
+                            >
+                                {child.name}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+
             <div className="dashboard-header">
                 <div className="baby-avatar">
-                    {childData.gender === 'boy' ? <Smile size={32} color="#0EA5E9" /> : childData.gender === 'girl' ? <Smile size={32} color="#EC4899" /> : <Baby size={32} color="#10B981" />}
+                    {activeChild.gender === 'boy' ? <Smile size={32} color="#0EA5E9" /> : activeChild.gender === 'girl' ? <Smile size={32} color="#EC4899" /> : <Baby size={32} color="#10B981" />}
                 </div>
                 <div>
-                    <h3 className="baby-name">{childData.name}</h3>
+                    <h3 className="baby-name">{activeChild.name}</h3>
                     <p className="baby-age" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                         {age !== null ? (age < 0 ? <>En camino <Heart size={16} color="#EC4899" fill="#EC4899" /></> : `${age} meses`) : 'Edad no definida'}
                     </p>

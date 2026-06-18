@@ -14,17 +14,21 @@ export const AuthProvider = ({ children }) => {
             ? { name: 'Usuario Prueba', email: 'usuario@ejemplo.com' } 
             : null;
     });
-    const [childData, setChildData] = useState(() => {
-        const storedChild = localStorage.getItem('huggies_child_data');
-        if (storedChild) {
+    
+    // Store an array of children
+    const [childrenData, setChildrenData] = useState(() => {
+        const storedChildren = localStorage.getItem('huggies_children_data');
+        if (storedChildren) {
             try {
-                return JSON.parse(storedChild);
+                return JSON.parse(storedChildren);
             } catch (e) {
-                console.error("Error parsing child data", e);
+                console.error("Error parsing children data", e);
             }
         }
-        return null;
+        return [];
     });
+    
+    const [activeChildIndex, setActiveChildIndex] = useState(0);
     
     // Tutorial state
     const [hasSeenTutorial, setHasSeenTutorial] = useState(() => {
@@ -43,17 +47,18 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('huggies_auth');
     };
 
-    const updateChildData = (newData) => {
-        if (!newData) {
-            setChildData(null);
-            localStorage.removeItem('huggies_child_data');
+    // Replaces the whole array
+    const updateChildrenData = (newDataArray) => {
+        if (!newDataArray || newDataArray.length === 0) {
+            setChildrenData([]);
+            setActiveChildIndex(0);
+            localStorage.removeItem('huggies_children_data');
             localStorage.removeItem('huggies_onboarding_completed');
             localStorage.removeItem('huggies_tutorial_completed');
             setHasSeenTutorial(false);
         } else {
-            const updated = { ...childData, ...newData };
-            setChildData(updated);
-            localStorage.setItem('huggies_child_data', JSON.stringify(updated));
+            setChildrenData(newDataArray);
+            localStorage.setItem('huggies_children_data', JSON.stringify(newDataArray));
             localStorage.setItem('huggies_onboarding_completed', 'true');
         }
     };
@@ -66,7 +71,8 @@ export const AuthProvider = ({ children }) => {
     return (
         <AuthContext.Provider value={{ 
             isAuthenticated, user, login, logout, 
-            childData, updateChildData,
+            childrenData, updateChildrenData,
+            activeChildIndex, setActiveChildIndex,
             hasSeenTutorial, completeTutorial
         }}>
             {children}
